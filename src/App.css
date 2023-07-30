@@ -2,20 +2,9 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: 10vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,15 +13,46 @@
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.TextBox {
+  width: 100%;
+  padding: 10px;
+  font-size: 32px;
+  border: 10px solid #d41616;
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  justify-content: space-evenly;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.SubButton {
+  background-color: #282c32;
+  text-align: center;
+  display: flex;
+}
+
+.row-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px; /* Optional, add spacing between rows */
+  justify-content: space-between; /* Add space between elements */
+  font-size: 32px;
+}
+
+.input-container {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  font-size: 32px;
+  margin-right: 10px; /* Optional, add spacing between input and button */
+  border: 10px solid #d41616;
+  justify-content: space-between; /* Add space between elements */
+  margin-bottom: 10px;
+}
+
+img {
+  max-width: 500px; /* Optional, set the maximum width for images */
+  margin-left: 10px; /* Optional, add spacing between image and input/button */
 }
