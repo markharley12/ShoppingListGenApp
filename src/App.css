@@ -1,9 +1,16 @@
+:root {
+  --main-bg-color: #282c34;
+  --main-border-color: #d41616;
+  --main-font-size: 32px;
+  --container-space: 10px;
+}
+
 .App {
   text-align: center;
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: var(--main-bg-color);
   min-height: 10vh;
   display: flex;
   flex-direction: column;
@@ -13,46 +20,41 @@
   color: white;
 }
 
-.TextBox {
+.TextBox, .input-container {
   width: 100%;
-  padding: 10px;
-  font-size: 32px;
-  border: 10px solid #d41616;
+  padding: var(--container-space);
+  font-size: var(--main-font-size);
+  border: var(--container-space) solid var(--main-border-color);
   display: flex;
   align-items: flex-start;
-  margin-bottom: 10px;
+  margin-bottom: var(--container-space);
   border-radius: 4px;
   justify-content: space-evenly;
 }
 
 .SubButton {
-  background-color: #282c32;
+  background-color: var(--main-bg-color);
   text-align: center;
   display: flex;
 }
 
-.row-container {
+.row-container, .input-container {
   width: 100%;
   display: flex;
   align-items: center;
-  margin-bottom: 20px; /* Optional, add spacing between rows */
-  justify-content: space-between; /* Add space between elements */
-  font-size: 32px;
+  font-size: var(--main-font-size);
+  justify-content: space-between;
+}
+
+.row-container {
+  margin-bottom: 2 * var(--container-space);
 }
 
 .input-container {
-  flex: 1;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  font-size: 32px;
-  margin-right: 10px; /* Optional, add spacing between input and button */
-  border: 10px solid #d41616;
-  justify-content: space-between; /* Add space between elements */
-  margin-bottom: 10px;
+  margin-right: var(--container-space);
 }
 
 img {
-  max-width: 500px; /* Optional, set the maximum width for images */
-  margin-left: 10px; /* Optional, add spacing between image and input/button */
+  max-width: 500px;
+  margin-left: var(--container-space);
 }
