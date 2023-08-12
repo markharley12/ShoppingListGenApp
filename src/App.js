@@ -1,64 +1,63 @@
 import React, { useState } from 'react';
 import fetchGoogleImage from './fetchGoogleImage';
 import { apiKey, cx } from './Private.js';
+import { selectNDinners, formatListAsSentence } from './fetchMeal.js';
 import './App.css';
 
 const App = () => {
-  const [searchWords, setSearchWords] = useState(['', '', '']);
-  const [imageUrls, setImageUrls] = useState([null, null, null]);
+    const [searchWord, setSearchWord] = useState('');  // Now it's a single word, for the number of meals.
+    const [mealNames, setMealNames] = useState([]);
+    const [imageUrls, setImageUrls] = useState([]);
 
-  const handleSearch = (index) => {
-    const searchWord = searchWords[index].trim();
+    const handleSearch = async () => {
+        const numDinners = parseInt(searchWord, 10);
 
-    if (searchWord) {
-      fetchGoogleImage(searchWord, apiKey, cx)
-        .then((url) => {
-          const newImageUrls = [...imageUrls];
-          newImageUrls[index] = url;
-          setImageUrls(newImageUrls);
-        })
-        .catch((error) => {
-          console.error('Error fetching Google image:', error);
-        });
-    }
-  };
+        if (!isNaN(numDinners) && numDinners > 0) {
+            try {
+                const dinners = await selectNDinners(numDinners, './lists/Dinners.md');
+                setMealNames(dinners);
 
-  return (
-    <div className="App">
-      {/* Header */}
-      <header className="App-header">
-        <h1>Shopping list generator App</h1>
-      </header>
+                const urls = await Promise.all(dinners.map(async mealName => {
+                    return await fetchGoogleImage(mealName, apiKey, cx);
+                }));
 
-      <div className="row-container">
-        {searchWords.map((word, index) => (
-          <div key={index} className="input-container">
-            <input
-              type="text"
-              value={word}
-              onChange={(e) => {
-                const newSearchWords = [...searchWords];
-                newSearchWords[index] = e.target.value;
-                setSearchWords(newSearchWords);
-              }}
-              placeholder={`Enter search word ${index + 1}`}
-            />
-            <div className='SearchButton'>
-              <button onClick={() => handleSearch(index)}>
-                Search {index + 1}
-              </button>
+                setImageUrls(urls);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    };
+
+    return (
+        <div className="App">
+            <header className="App-header">
+                <h1>Shopping list generator App</h1>
+            </header>
+
+            <div className="input-container">
+                <input
+                    type="text"
+                    value={searchWord}
+                    onChange={(e) => setSearchWord(e.target.value)}
+                    placeholder="Enter number of meals"
+                />
+                <div className='SearchButton'>
+                    <button onClick={handleSearch}>
+                        Generate Meals
+                    </button>
+                </div>
             </div>
-          </div>
-        ))}
-      </div>
 
-      <div className="row-container">
-        {imageUrls.map((url, index) => (
-          url ? <img key={index} src={url} alt={searchWords[index]} /> : null
-        ))}
-      </div>
-    </div>
-  );
+            <div className="row-container">
+                {mealNames.map((mealName, index) => (
+                    <div key={index} className="meal-card">
+                        <h3>{mealName}</h3>
+                        <img src={imageUrls[index]} alt={mealName} />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 };
 
 export default App;
