@@ -27,7 +27,7 @@ const App = () => {
     <div className="App">
       {/* Header */}
       <header className="App-header">
-        <h1>Image Search App</h1>
+        <h1>Shopping list generator App</h1>
       </header>
 
       <div className="row-container">
