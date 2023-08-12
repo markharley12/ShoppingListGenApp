@@ -58,6 +58,27 @@
   margin-bottom: 2 * var(--container-space);
 }
 
+.prompt-container {
+  width: 100%;
+  padding: var(--container-space);
+  display: flex;
+  flex-direction: column; /* Stacking textareas vertically */
+  align-items: center;
+  margin-bottom: var(--container-space);
+  border-radius: 4px;
+}
+
+.prompt-container textarea {
+  width: 80%; /* You can adjust this if needed */
+  padding: 10px var(--container-space);
+  font-size: calc(var(--main-font-size) * 1.2);
+  border-radius: 6px;
+  margin-top: var(--container-space);
+  border: 2px solid var(--main-border-color);
+  color: var(--main-bg-color); /* Adjusting font color */
+  background-color: var(--main-comp-color); /* Adjusting background color */
+}
+
 .input-container {
   margin-right: var(--container-space);
 }

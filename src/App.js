@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import fetchGoogleImage from './fetchGoogleImage';
 import { apiKey, cx } from './Private.js';
-import { selectNDinners, formatListAsSentence } from './fetchMeal.js';
+import { selectNDinners, formatListAsSentence, gptShoppingListPrompt, gptShoppingListPrompt2 } from './fetchMeal.js';
 import './App.css';
 
 const App = () => {
@@ -55,6 +55,12 @@ const App = () => {
                         <img src={imageUrls[index]} alt={mealName} />
                     </div>
                 ))}
+            </div>
+            
+            {/* New addition */}
+            <div className="prompt-container">
+                <textarea readOnly value={gptShoppingListPrompt(formatListAsSentence(mealNames))}></textarea>
+                <textarea readOnly value={gptShoppingListPrompt2()}></textarea>
             </div>
         </div>
     );
