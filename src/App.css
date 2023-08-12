@@ -1,6 +1,7 @@
 :root {
   --main-bg-color: #282c34;
   --main-border-color: #d41616;
+  --main-comp-color: #eaeaea; /* Light Grey Color */
   --main-font-size: 32px;
   --container-space: 10px;
 }
@@ -32,9 +33,16 @@
   justify-content: space-evenly;
 }
 
-.SubButton {
-  background-color: var(--main-bg-color);
+.TextBox input, .input-container input { /* <-- Specific styles for input inside .TextBox and .input-container */
+  font-size: calc(var(--main-font-size) * 1.2); /* Increase font size */
+  padding: 10px var(--container-space); /* Vertical and horizontal padding */
+  border-radius: 6px; /* Optional: Adjust border-radius */
+}
+
+.SearchButton button, .input-container input {
+  background-color: var(--main-comp-color);
   text-align: center;
+  font-size: calc(var(--main-font-size) * 1.2); /* Increase font size */
   display: flex;
 }
 

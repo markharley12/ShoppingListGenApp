@@ -25,6 +25,11 @@ const App = () => {
 
   return (
     <div className="App">
+      {/* Header */}
+      <header className="App-header">
+        <h1>Image Search App</h1>
+      </header>
+
       <div className="row-container">
         {searchWords.map((word, index) => (
           <div key={index} className="input-container">
@@ -38,9 +43,11 @@ const App = () => {
               }}
               placeholder={`Enter search word ${index + 1}`}
             />
-            <button onClick={() => handleSearch(index)}>
-              Search {index + 1}
-            </button>
+            <div className='SearchButton'>
+              <button onClick={() => handleSearch(index)}>
+                Search {index + 1}
+              </button>
+            </div>
           </div>
         ))}
       </div>
