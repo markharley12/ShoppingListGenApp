@@ -1,24 +1,35 @@
-// fetchMeal.js
-
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
-function read_file_lines(file_path) {
-    const content = fs.readFileSync(file_path, 'utf-8');
-    const lines = content.split('\n').map(line => line.trim());
-    return lines;
+async function readFileLines(filePath) {
+    const content = await fs.readFile(filePath, 'utf-8');
+    return content.split('\n').map(line => line.trim());
 }
 
-function randomSample(arr, n) {
-    const shuffled = arr.slice().sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, n);
+function fisherYatesShuffle(array) {
+    let counter = array.length;
+
+    // While there are elements in the array
+    while (counter > 0) {
+        // Pick a random index
+        let index = Math.floor(Math.random() * counter);
+
+        // Decrease counter by 1
+        counter--;
+
+        // Swap the last element with the chosen one
+        let temp = array[counter];
+        array[counter] = array[index];
+        array[index] = temp;
+    }
+    return array;
 }
 
-function select_n_dinners(n) {
-    const script_directory = __dirname;
-    const relative_file_path = path.join(script_directory, './lists/Dinners.md');
-    const dinner_list = read_file_lines(relative_file_path);
-    return randomSample(dinner_list, n);
+async function selectNDinners(n) {
+    const scriptDirectory = __dirname;
+    const relativeFilePath = path.join(scriptDirectory, './lists/Dinners.md');
+    const dinnerList = await readFileLines(relativeFilePath);
+    return fisherYatesShuffle(dinnerList).slice(0, n);
 }
 
 function formatListAsSentence(items) {
@@ -27,15 +38,17 @@ function formatListAsSentence(items) {
     } else if (items.length === 1) {
         return items[0];
     } else {
-        const last_item = items[items.length - 1];
-        const items_except_last = items.slice(0, -1).join(', ');
-        return `${items_except_last}, and ${last_item}`;
+        const lastItem = items[items.length - 1];
+        const itemsExceptLast = items.slice(0, -1).join(', ');
+        return `${itemsExceptLast}, and ${lastItem}`;
     }
 }
 
-function printTest() {
-    dinners = select_n_dinners(3)
-    formattedDinners = formatListAsSentence(dinners);
+async function printTest() {
+    const dinners = await selectNDinners(3);
+    const formattedDinners = formatListAsSentence(dinners);
     console.log(`I would like to cook the following meals: ${formattedDinners}. What are the ingredients I would need for each of these? Be minimalist and exclude quantities. Group together similar items in the shopping list.`);
-    console.log("List just the ingredients in one long list, grouping similar items with subheadings for the item types")
+    console.log("List just the ingredients in one long list, grouping similar items with subheadings for the item types");
 }
+
+printTest();  // Don't forget to call the function to test it
