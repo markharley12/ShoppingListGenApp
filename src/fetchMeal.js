@@ -23,6 +23,7 @@ function fisherYatesShuffle(array) {
  * @returns {Promise<string[]>} n selected dinners.
  */
 export async function selectNDinners(n) {
+    console.log("SelectNDinners called with n=%d",n);
     return fisherYatesShuffle(dinnerList).slice(0, n);
 }
 
@@ -32,10 +33,13 @@ export async function selectNDinners(n) {
  * @returns {string} Formatted sentence.
  */
 export function formatListAsSentence(items) {
-    if (!items.length) return "";
-    if (items.length === 1) return items[0];
-    const lastItem = items.pop();
-    return `${items.join(', ')}, and ${lastItem}`;
+    console.log("formatListAsSentence was called on items which is length: %d", items.length)
+    console.log("Items:", items)
+    const itemsCopy = [...items]; // Creating a copy of the array
+    if (!itemsCopy.length) return "";
+    if (itemsCopy.length === 1) return itemsCopy[0];
+    const lastItem = itemsCopy.pop(); // Modifying the copy, not the original array
+    return `${itemsCopy.join(', ')}, and ${lastItem}`;
 }
 
 export function gptShoppingListPrompt(formattedDinners) {
@@ -46,11 +50,12 @@ export function gptShoppingListPrompt2() {
     return "List just the ingredients in one long list, grouping similar items with subheadings for the item types"
 }
 
-async function printTest() {
-    const dinners = await selectNDinners(3);
-    const formattedDinners = formatListAsSentence(dinners);
-    console.log(gptShoppingListPrompt(formattedDinners));
-    console.log(gptShoppingListPrompt2());
-}
+// Test the function - useful for debugging
+// async function printTest() {
+//     const dinners = await selectNDinners(3);
+//     const formattedDinners = formatListAsSentence(dinners);
+//     console.log(gptShoppingListPrompt(formattedDinners));
+//     console.log(gptShoppingListPrompt2());
+// }
 
-printTest();
+// printTest();

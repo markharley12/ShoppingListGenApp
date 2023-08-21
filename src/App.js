@@ -16,6 +16,7 @@ const App = () => {
             try {
                 const dinners = await selectNDinners(numDinners, './lists/Dinners.md');
                 setMealNames(dinners);
+                console.log(dinners);
 
                 const urls = await Promise.all(dinners.map(async mealName => {
                     return await fetchGoogleImage(mealName, apiKey, cx);
