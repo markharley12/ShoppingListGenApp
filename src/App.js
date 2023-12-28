@@ -9,14 +9,13 @@ const App = () => {
     const [searchWord, setSearchWord] = useState('');  // Now it's a single word, for the number of meals.
     const [mealNames, setMealNames] = useState([]);
     const [shoppingListPrompt, setShoppingListPrompt] = useState([]);
+    const [shoppingListPrompt2, setShoppingListPrompt2] = useState([]);
     const [imageUrls, setImageUrls] = useState([]);
+    const [result1, setresult1] = useState([]);
     const [result2, setresult2] = useState([]);
 
-    // New State for Bot messages
-    const [botMessages, setBotMessages] = useState("");
-
     // Function to handle the streaming of messages
-    const handleLlamaStreamQnA = async (prompt) => {
+    const handleLlamaStreamQnA = async (prompt, setBotMessages) => {
         setBotMessages("")
         for await (const message of llamaStreamQnA(prompt)) {
             console.log(message);
@@ -41,7 +40,12 @@ const App = () => {
                 setImageUrls(urls);
 
                 // Call the streaming function with the prompt
-                handleLlamaStreamQnA(shoppingListPrompt1);
+                await handleLlamaStreamQnA(shoppingListPrompt1, setresult1);
+
+                const shoppingListPrompt2 = gptShoppingListPrompt2();
+                setShoppingListPrompt2(shoppingListPrompt2);
+
+                handleLlamaStreamQnA(shoppingListPrompt1, setresult2);
 
             } catch (error) {
                 console.error('Error:', error);
@@ -81,9 +85,9 @@ const App = () => {
             {/* New addition */}
             <div className="prompt-container">
                 <textarea readOnly value={shoppingListPrompt}></textarea>
-                <textarea readOnly value={botMessages}></textarea>
+                <textarea readOnly value={result1}></textarea>
                 <textarea readOnly value={gptShoppingListPrompt2()}></textarea>
-                <textarea readOnly value={"Result2"}></textarea>
+                <textarea readOnly value={result2}></textarea>
             </div>
         </div>
     );
