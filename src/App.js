@@ -17,7 +17,7 @@ const App = () => {
 
     // Function to handle the streaming of messages
     const handleLlamaStreamQnA = async (prompt) => {
-        const prev = "";
+        setBotMessages("")
         for await (const message of llamaStreamQnA(prompt)) {
             console.log(message);
             setBotMessages(prev => prev + message); // Append new message

@@ -2,7 +2,7 @@
   --main-bg-color: #282c34;
   --main-border-color: #d41616;
   --main-comp-color: #eaeaea; /* Light Grey Color */
-  --main-font-size: 32px;
+  --main-font-size: 12px;
   --container-space: 10px;
 }
 
@@ -69,7 +69,7 @@
 }
 
 .prompt-container textarea {
-  width: 80%; /* You can adjust this if needed */
+  width: 95%; /* You can adjust this if needed */
   padding: 10px var(--container-space);
   font-size: calc(var(--main-font-size) * 1.2);
   border-radius: 6px;
@@ -80,10 +80,12 @@
 }
 
 .input-container {
+  width: 95%;
   margin-right: var(--container-space);
 }
 
 img {
   max-width: 500px;
+  max-height: 400px;
   margin-left: var(--container-space);
 }
