@@ -16,7 +16,7 @@ const parseStreamStringToJson = (streamString) => {
 const wrapPrompt = (basePrompt) => {
     switch(modelType) {
         case "zephyr":
-            return ` You are a helpful assistant. </s>  ${basePrompt} </s> `;
+            return `<|system|> You are a helpful assistant. </s> <|user|> ${basePrompt} </s> <|assistant|>`;
         case "CodeLlama":
             return `
 [INST] Write code to solve the following coding problem that obeys the constraints and passes the example test cases. Please wrap your code answer using \`\`\`:
@@ -49,18 +49,6 @@ const getInputJson = (input) => {
             max_tokens: 512,
             stream: true
         };
-    }
-};
-
-const llamaRequest = async (payload) => {
-    if (DEBUG) {
-        console.log(`${llmApiUrl} : HTTP request POST : ${JSON.stringify(payload)}`);
-    }
-    try {
-        const response = await axios.post(llmApiUrl, payload);
-        return response.data;
-    } catch (error) {
-        console.error("Error in llamaRequest:", error);
     }
 };
 
@@ -99,19 +87,6 @@ const llamaStreamRequest = async function* (payload) {
         }
     } catch (e) {
         console.error(`An error occurred in llamaStreamRequest: ${e}`);
-    }
-};
-
-
-const llamaQnA = async (question) => {
-    const wrappedQuestion = wrapPrompt(question);
-    const inputJson = getInputJson(wrappedQuestion);
-    try {
-        const response = await llamaRequest(inputJson);
-        console.log(response);
-        return response
-    } catch (error) {
-        console.error("Error in llamaQnA:", error);
     }
 };
 
