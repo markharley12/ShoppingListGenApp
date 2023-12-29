@@ -16,7 +16,7 @@ const parseStreamStringToJson = (streamString) => {
 const wrapPrompt = (basePrompt) => {
     switch(modelType) {
         case "zephyr":
-            return `<|system|> You are a helpful assistant. </s> <|user|> ${basePrompt} </s> <|assistant|>`;
+            return `<|system|> You are a helpful assistant. </s> <|user|> ${basePrompt} </s> <|assistant|>\n`;
         case "CodeLlama":
             return `
 [INST] Write code to solve the following coding problem that obeys the constraints and passes the example test cases. Please wrap your code answer using \`\`\`:
@@ -61,7 +61,6 @@ const llamaStreamRequest = async function* (payload) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                // Add any other necessary headers here
             },
             body: JSON.stringify(payload)
         });
@@ -102,7 +101,6 @@ export default async function* llamaStreamQnA(question) {
 // Main function to demonstrate usage
 const main = async () => {
     const inputStr="print hello world in python"
-    // const inputStr="I would like to cook the following meals: Crispy baked tofu with sesame noodles, and Vegetable lasagna with garlic bread. What are the ingredients I would need for each of these? Be minimalist and exclude quantities. Group together similar items in the shopping list."
     console.log(`[User] ${inputStr}`);
     process.stdout.write("[Bot] ")
 

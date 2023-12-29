@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import fetchGoogleImage from './fetchGoogleImage';
 import llamaStreamQnA from './createShoppingList.js';
 import { apiKey, cx } from './Private.js';
@@ -16,12 +16,43 @@ const App = () => {
 
     // Function to handle the streaming of messages
     const handleLlamaStreamQnA = async (prompt, setBotMessages) => {
+        console.log("prompt:")
+        console.log(prompt)
         setBotMessages("")
         for await (const message of llamaStreamQnA(prompt)) {
             console.log(message);
             setBotMessages(prev => prev + message); // Append new message
         }
     };
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    useEffect(() => {
+        console.log("useEffect Called")
+        const handlePrompts = async () => {
+            console.log(result1.length);
+            console.log(shoppingListPrompt2.length);
+            if (result1.length > 0 && result1 != "slot unavailable" && shoppingListPrompt2.length > 0) { // Check for non-empty
+                console.log("Ready to process with updated prompts");
+                console.log("Waiting 5 secs for LLM api to refresh");
+                await sleep(5000); // Wait for 5 seconds
+    
+                await handleLlamaStreamQnA(prompt2(), setresult2);
+            }
+        };
+    
+        handlePrompts();
+    }, [result1, shoppingListPrompt2]); // Depend on result1 and shoppingListPrompt2
+    
+    
+
+    function prompt2() {
+        const result1Str = Array.isArray(result1) ? result1.join(', ') : result1;
+        const shoppingListPrompt2Str = Array.isArray(shoppingListPrompt2) ? shoppingListPrompt2.join(', ') : shoppingListPrompt2;
+        return `My shopping list is: ${result1Str}\n\n Task:\n${shoppingListPrompt2Str}`;
+    }  
 
     const handleSearch = async () => {
         const numDinners = parseInt(searchWord, 10);
@@ -42,10 +73,12 @@ const App = () => {
                 // Call the streaming function with the prompt
                 await handleLlamaStreamQnA(shoppingListPrompt1, setresult1);
 
-                const shoppingListPrompt2 = gptShoppingListPrompt2();
-                setShoppingListPrompt2(shoppingListPrompt2);
+                console.log("finised request 1")
 
-                handleLlamaStreamQnA(shoppingListPrompt1, setresult2);
+                const shopListPrompt2 = gptShoppingListPrompt2();
+                await setShoppingListPrompt2(shopListPrompt2);
+
+                console.log("finised setting gptShoppingListPrompt2")
 
             } catch (error) {
                 console.error('Error:', error);
@@ -81,13 +114,12 @@ const App = () => {
                     </div>
                 ))}
             </div>
-            
-            {/* New addition */}
+
             <div className="prompt-container">
-                <textarea readOnly value={shoppingListPrompt}></textarea>
-                <textarea readOnly value={result1}></textarea>
-                <textarea readOnly value={gptShoppingListPrompt2()}></textarea>
-                <textarea readOnly value={result2}></textarea>
+                <textarea readOnly value={`[User] ${shoppingListPrompt}`}></textarea>
+                <textarea readOnly value={`[Bot] ${result1}`}></textarea>
+                <textarea readOnly value={`[User] ${shoppingListPrompt2}`}></textarea>
+                <textarea readOnly value={`[Bot] ${result2}`}></textarea>
             </div>
         </div>
     );
