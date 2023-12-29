@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import fetchGoogleImage from './fetchGoogleImage';
 import llamaStreamQnA from './createShoppingList.js';
 import { apiKey, cx } from './Private.js';
@@ -14,10 +14,32 @@ const App = () => {
     const [result1, setresult1] = useState([]);
     const [result2, setresult2] = useState([]);
 
-    // Function to handle the streaming of messages
+    const AutoResizingTextArea = ({ label, content }) => {
+        const textareaRef = useRef(null);
+
+        useEffect(() => {
+            // This function adjusts the height of textarea to fit its content
+            const adjustHeight = () => {
+            const textarea = textareaRef.current;
+            if (!textarea) return;
+            textarea.style.height = 'inherit'; // Reset height to recalibrate
+            textarea.style.height = `${textarea.scrollHeight}px`; // Set to scroll height
+            };
+
+            adjustHeight();
+        }, [content]); // Run the effect on content change
+
+        return (
+            <textarea
+            readOnly
+            ref={textareaRef}
+            value={`${label} ${content}`}
+            />
+        );
+    };
+
     const handleLlamaStreamQnA = async (prompt, setBotMessages) => {
-        console.log("prompt:")
-        console.log(prompt)
+        console.log(`prompt:\n${prompt}`)
         setBotMessages("")
         for await (const message of llamaStreamQnA(prompt)) {
             console.log(message);
@@ -30,10 +52,8 @@ const App = () => {
     }
 
     useEffect(() => {
-        console.log("useEffect Called")
+        console.log(`useEffect Called ${result1.length} ${shoppingListPrompt2.length}`)
         const handlePrompts = async () => {
-            console.log(result1.length);
-            console.log(shoppingListPrompt2.length);
             if (result1.length > 0 && result1 != "slot unavailable" && shoppingListPrompt2.length > 0) { // Check for non-empty
                 console.log("Ready to process with updated prompts");
                 console.log("Waiting 5 secs for LLM api to refresh");
@@ -45,8 +65,6 @@ const App = () => {
     
         handlePrompts();
     }, [result1, shoppingListPrompt2]); // Depend on result1 and shoppingListPrompt2
-    
-    
 
     function prompt2() {
         const result1Str = Array.isArray(result1) ? result1.join(', ') : result1;
@@ -70,14 +88,10 @@ const App = () => {
                 }));
                 setImageUrls(urls);
 
-                // Call the streaming function with the prompt
                 await handleLlamaStreamQnA(shoppingListPrompt1, setresult1);
-
                 console.log("finised request 1")
 
-                const shopListPrompt2 = gptShoppingListPrompt2();
-                await setShoppingListPrompt2(shopListPrompt2);
-
+                await setShoppingListPrompt2(gptShoppingListPrompt2());
                 console.log("finised setting gptShoppingListPrompt2")
 
             } catch (error) {
@@ -116,10 +130,10 @@ const App = () => {
             </div>
 
             <div className="prompt-container">
-                <textarea readOnly value={`[User] ${shoppingListPrompt}`}></textarea>
-                <textarea readOnly value={`[Bot] ${result1}`}></textarea>
-                <textarea readOnly value={`[User] ${shoppingListPrompt2}`}></textarea>
-                <textarea readOnly value={`[Bot] ${result2}`}></textarea>
+                <AutoResizingTextArea label="[User]" content={shoppingListPrompt} />
+                <AutoResizingTextArea label="[Bot]" content={result1} />
+                <AutoResizingTextArea label="[User]" content={shoppingListPrompt2} />
+                <AutoResizingTextArea label="[Bot]" content={result2} />
             </div>
         </div>
     );

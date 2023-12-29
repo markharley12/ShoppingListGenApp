@@ -19,6 +19,8 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  width: 100%;
 }
 
 .TextBox, .input-container {
@@ -31,6 +33,7 @@
   margin-bottom: var(--container-space);
   border-radius: 4px;
   justify-content: space-evenly;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 .TextBox input, .input-container input { /* <-- Specific styles for input inside .TextBox and .input-container */
@@ -65,7 +68,7 @@
   flex-direction: column; /* Stacking textareas vertically */
   align-items: center;
   margin-bottom: var(--container-space);
-  border-radius: 4px;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 .prompt-container textarea {
@@ -77,11 +80,15 @@
   border: 2px solid var(--main-border-color);
   color: var(--main-bg-color); /* Adjusting font color */
   background-color: var(--main-comp-color); /* Adjusting background color */
+  overflow: hidden; /* Hide scrollbar */
+  resize: none; /* Disable manual resize */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 .input-container {
-  width: 95%;
+  width: 100%;
   margin-right: var(--container-space);
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 img {
