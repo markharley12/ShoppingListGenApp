@@ -96,3 +96,19 @@ img {
   max-height: 400px;
   margin-left: var(--container-space);
 }
+
+.meal-card {
+  display: flex;
+  flex-direction: column; /* This ensures the flex items (children) are stacked vertically */
+}
+
+.meal-card input {
+  /* Add styling for your input here */
+  margin-bottom: 10px; /* This adds space between the input and the image */
+}
+
+.meal-card img {
+  /* Add styling for your images here */
+  width: 100%; /* Example to ensure image fits inside the container */
+  height: auto; /* Keep the aspect ratio of the image */
+}

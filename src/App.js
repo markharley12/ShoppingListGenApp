@@ -134,52 +134,52 @@ const App = () => {
     };
 
     return (
-<div className="App">
-    <header className="App-header">
-        <h1>Shopping list generator App</h1>
-    </header>
+        <div className="App">
+            <header className="App-header">
+                <h1>Shopping list generator App</h1>
+            </header>
 
-    <div className="input-container">
-        <input
-            type="text"
-            value={numMeals}
-            onChange={(e) => setNumMeals(e.target.value)}
-            placeholder="Enter number of meals"
-        />
-        <div className='SearchButton'>
-            <button onClick={handleSearch}>
-                Generate New Meals
-            </button>
+            <div className="input-container">
+                <input
+                    type="text"
+                    value={numMeals}
+                    onChange={(e) => setNumMeals(e.target.value)}
+                    placeholder="Enter number of meals"
+                />
+                <div className='SearchButton'>
+                    <button onClick={handleSearch}>
+                        Generate New Meals
+                    </button>
+                </div>
+            </div>
+
+            <div className="update-meals-container">
+                <button onClick={updateMeals}>
+                    Update Meals
+                </button>
+            </div>
+
+            <div className="row-container">
+                {tempMealNames.map((tempMealName, index) => (
+                    <div key={index} className="meal-card">
+                        <input 
+                            type="text" 
+                            value={tempMealName}
+                            onChange={(e) => handleMealNameChange(e, index)} 
+                            className="editable-meal-name"
+                        />
+                        <img src={imageUrls[index]} alt={tempMealName} />
+                    </div>
+                ))}
+            </div>
+
+            <div className="prompt-container">
+                <AutoResizingTextArea label="[User]" content={shoppingListPrompt} />
+                <AutoResizingTextArea label="[Bot]" content={result1} />
+                <AutoResizingTextArea label="[User]" content={shoppingListPrompt2} />
+                <AutoResizingTextArea label="[Bot]" content={result2} />
+            </div>
         </div>
-    </div>
-
-    <div className="update-meals-container">
-        <button onClick={updateMeals}>
-            Update Meals
-        </button>
-    </div>
-
-    <div className="row-container">
-    {mealNames.map((mealName, index) => (
-        <div key={index} className="meal-card">
-            <input 
-                type="text" 
-                value={tempMealNames[index] || mealName} 
-                onChange={(e) => handleMealNameChange(e, index)} 
-                className="editable-meal-name"
-            />
-            <img src={imageUrls[index]} alt={mealName} />
-        </div>
-    ))}
-</div>
-
-    <div className="prompt-container">
-        <AutoResizingTextArea label="[User]" content={shoppingListPrompt} />
-        <AutoResizingTextArea label="[Bot]" content={result1} />
-        <AutoResizingTextArea label="[User]" content={shoppingListPrompt2} />
-        <AutoResizingTextArea label="[Bot]" content={result2} />
-    </div>
-</div>
     );
 };
 
