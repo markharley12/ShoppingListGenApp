@@ -8,6 +8,7 @@ import './App.css';
 const App = () => {
     const [numMeals, setNumMeals] = useState('');
     const [mealNames, setMealNames] = useState([]);
+    const [tempMealNames, setTempMealNames] = useState([]);
     const [shoppingListPrompt, setShoppingListPrompt] = useState([]);
     const [shoppingListPrompt2, setShoppingListPrompt2] = useState([]);
     const [imageUrls, setImageUrls] = useState([]);
@@ -76,7 +77,8 @@ const App = () => {
             try {
                 // const dinners = await selectNDinners(numDinners, './lists/Dinners.md');
                 // setMealNames(dinners);
-                const mealNamesStr = Array.isArray(mealNames) ? mealNames.join(', ') : mealNames;
+                setMealNames(tempMealNames);
+                // const mealNamesStr = Array.isArray(mealNames) ? mealNames.join(', ') : mealNames;
                 const shoppingListPrompt1 = gptShoppingListPrompt(formatListAsSentence(mealNames));
                 setShoppingListPrompt(shoppingListPrompt1);
                 console.log(shoppingListPrompt1);
@@ -103,6 +105,7 @@ const App = () => {
             try {
                 const dinners = await selectNDinners(numDinners, './lists/Dinners.md');
                 setMealNames(dinners);
+                setTempMealNames(dinners);
                 const shoppingListPrompt1 = gptShoppingListPrompt(formatListAsSentence(dinners));
                 setShoppingListPrompt(shoppingListPrompt1);
                 console.log(shoppingListPrompt1);
@@ -125,56 +128,58 @@ const App = () => {
     };
 
     const handleMealNameChange = (event, index) => {
-        // Create a new array with the same content as mealNames
-        const updatedMealNames = [...mealNames];
-        // Update the name of the specific meal using the index
-        updatedMealNames[index] = event.target.value;
-        // Set the new array to state
-        setMealNames(updatedMealNames);
-        updateMeals();
+        const updatedTempMealNames = [...tempMealNames];
+        updatedTempMealNames[index] = event.target.value;
+        setTempMealNames(updatedTempMealNames);
     };
 
     return (
-        <div className="App">
-            <header className="App-header">
-                <h1>Shopping list generator App</h1>
-            </header>
+<div className="App">
+    <header className="App-header">
+        <h1>Shopping list generator App</h1>
+    </header>
 
-            <div className="input-container">
-                <input
-                    type="text"
-                    value={numMeals}
-                    onChange={(e) => setNumMeals(e.target.value)}
-                    placeholder="Enter number of meals"
-                />
-                <div className='SearchButton'>
-                    <button onClick={handleSearch}>
-                        Generate New Meals
-                    </button>
-                </div>
-            </div>
-
-            <div className="row-container">
-                {mealNames.map((mealName, index) => (
-                    <div key={index} className="meal-card">
-                        <input 
-                            type="text" 
-                            value={mealName} 
-                            onChange={(e) => handleMealNameChange(e, index)} 
-                            className="editable-meal-name"
-                        />
-                        <img src={imageUrls[index]} alt={mealName} />
-                    </div>
-                ))}
-            </div>
-
-            <div className="prompt-container">
-                <AutoResizingTextArea label="[User]" content={shoppingListPrompt} />
-                <AutoResizingTextArea label="[Bot]" content={result1} />
-                <AutoResizingTextArea label="[User]" content={shoppingListPrompt2} />
-                <AutoResizingTextArea label="[Bot]" content={result2} />
-            </div>
+    <div className="input-container">
+        <input
+            type="text"
+            value={numMeals}
+            onChange={(e) => setNumMeals(e.target.value)}
+            placeholder="Enter number of meals"
+        />
+        <div className='SearchButton'>
+            <button onClick={handleSearch}>
+                Generate New Meals
+            </button>
         </div>
+    </div>
+
+    <div className="update-meals-container">
+        <button onClick={updateMeals}>
+            Update Meals
+        </button>
+    </div>
+
+    <div className="row-container">
+    {mealNames.map((mealName, index) => (
+        <div key={index} className="meal-card">
+            <input 
+                type="text" 
+                value={tempMealNames[index] || mealName} 
+                onChange={(e) => handleMealNameChange(e, index)} 
+                className="editable-meal-name"
+            />
+            <img src={imageUrls[index]} alt={mealName} />
+        </div>
+    ))}
+</div>
+
+    <div className="prompt-container">
+        <AutoResizingTextArea label="[User]" content={shoppingListPrompt} />
+        <AutoResizingTextArea label="[Bot]" content={result1} />
+        <AutoResizingTextArea label="[User]" content={shoppingListPrompt2} />
+        <AutoResizingTextArea label="[Bot]" content={result2} />
+    </div>
+</div>
     );
 };
 
