@@ -6,7 +6,7 @@ import { selectNDinners, formatListAsSentence, gptShoppingListPrompt, gptShoppin
 import './App.css';
 
 const App = () => {
-    const [searchWord, setSearchWord] = useState('');  // Now it's a single word, for the number of meals.
+    const [numMeals, setNumMeals] = useState('');
     const [mealNames, setMealNames] = useState([]);
     const [shoppingListPrompt, setShoppingListPrompt] = useState([]);
     const [shoppingListPrompt2, setShoppingListPrompt2] = useState([]);
@@ -43,7 +43,7 @@ const App = () => {
         setBotMessages("")
         for await (const message of llamaStreamQnA(prompt)) {
             console.log(message);
-            setBotMessages(prev => prev + message); // Append new message
+            setBotMessages(prev => prev + message);
         }
     };
 
@@ -64,7 +64,7 @@ const App = () => {
         };
     
         handlePrompts();
-    }, [result1, shoppingListPrompt2]); // Depend on result1 and shoppingListPrompt2
+    }, [result1, shoppingListPrompt2]); //Run the effect on change of result1 or shoppingListPrompt2
 
     function prompt2() {
         const result1Str = Array.isArray(result1) ? result1.join(', ') : result1;
@@ -72,8 +72,32 @@ const App = () => {
         return `My shopping list is: ${result1Str}\n\n Task:\n${shoppingListPrompt2Str}`;
     }  
 
+    async function updateMeals() {
+            try {
+                // const dinners = await selectNDinners(numDinners, './lists/Dinners.md');
+                // setMealNames(dinners);
+                const mealNamesStr = Array.isArray(mealNames) ? mealNames.join(', ') : mealNames;
+                const shoppingListPrompt1 = gptShoppingListPrompt(formatListAsSentence(mealNames));
+                setShoppingListPrompt(shoppingListPrompt1);
+                console.log(shoppingListPrompt1);
+
+                const urls = await Promise.all(mealNames.map(async mealName => {
+                    return await fetchGoogleImage(mealName, apiKey, cx);
+                }));
+                setImageUrls(urls);
+
+                await handleLlamaStreamQnA(shoppingListPrompt1, setresult1);
+                console.log("finised request 1")
+
+                await setShoppingListPrompt2(gptShoppingListPrompt2());
+                console.log("finised setting gptShoppingListPrompt2")
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
     const handleSearch = async () => {
-        const numDinners = parseInt(searchWord, 10);
+        const numDinners = parseInt(numMeals, 10);
 
         if (!isNaN(numDinners) && numDinners > 0) {
             try {
@@ -100,6 +124,16 @@ const App = () => {
         }
     };
 
+    const handleMealNameChange = (event, index) => {
+        // Create a new array with the same content as mealNames
+        const updatedMealNames = [...mealNames];
+        // Update the name of the specific meal using the index
+        updatedMealNames[index] = event.target.value;
+        // Set the new array to state
+        setMealNames(updatedMealNames);
+        updateMeals();
+    };
+
     return (
         <div className="App">
             <header className="App-header">
@@ -109,13 +143,13 @@ const App = () => {
             <div className="input-container">
                 <input
                     type="text"
-                    value={searchWord}
-                    onChange={(e) => setSearchWord(e.target.value)}
+                    value={numMeals}
+                    onChange={(e) => setNumMeals(e.target.value)}
                     placeholder="Enter number of meals"
                 />
                 <div className='SearchButton'>
                     <button onClick={handleSearch}>
-                        Generate Meals
+                        Generate New Meals
                     </button>
                 </div>
             </div>
@@ -123,7 +157,12 @@ const App = () => {
             <div className="row-container">
                 {mealNames.map((mealName, index) => (
                     <div key={index} className="meal-card">
-                        <h3>{mealName}</h3>
+                        <input 
+                            type="text" 
+                            value={mealName} 
+                            onChange={(e) => handleMealNameChange(e, index)} 
+                            className="editable-meal-name"
+                        />
                         <img src={imageUrls[index]} alt={mealName} />
                     </div>
                 ))}
