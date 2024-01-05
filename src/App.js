@@ -73,22 +73,29 @@ const App = () => {
         return `My shopping list is: ${result1Str}\n\n Task:\n${shoppingListPrompt2Str}`;
     }  
 
+    async function fetchMealImages(mealNames) {
+        try {
+            const urls = await Promise.all(mealNames.map(async mealName => {
+                return await fetchGoogleImage(mealName, apiKey, cx);
+            }));
+            return urls;
+        } catch (error) {
+            console.error('Error fetching images:', error);
+            return []; // Return an empty array as a fallback
+        }
+    }
+
     async function updateMeals() {
             try {
-                // const dinners = await selectNDinners(numDinners, './lists/Dinners.md');
-                // setMealNames(dinners);
-                setMealNames(tempMealNames);
-                // const mealNamesStr = Array.isArray(mealNames) ? mealNames.join(', ') : mealNames;
-                const shoppingListPrompt1 = gptShoppingListPrompt(formatListAsSentence(mealNames));
-                setShoppingListPrompt(shoppingListPrompt1);
-                console.log(shoppingListPrompt1);
+                await setMealNames(tempMealNames);
+                const prompt = gptShoppingListPrompt(formatListAsSentence(tempMealNames));
+                setShoppingListPrompt(prompt);
+                console.log(prompt);
 
-                const urls = await Promise.all(mealNames.map(async mealName => {
-                    return await fetchGoogleImage(mealName, apiKey, cx);
-                }));
+                const urls = await fetchMealImages(tempMealNames);
                 setImageUrls(urls);
 
-                await handleLlamaStreamQnA(shoppingListPrompt1, setresult1);
+                await handleLlamaStreamQnA(prompt, setresult1);
                 console.log("finised request 1")
 
                 await setShoppingListPrompt2(gptShoppingListPrompt2());
@@ -106,16 +113,14 @@ const App = () => {
                 const dinners = await selectNDinners(numDinners, './lists/Dinners.md');
                 setMealNames(dinners);
                 setTempMealNames(dinners);
-                const shoppingListPrompt1 = gptShoppingListPrompt(formatListAsSentence(dinners));
-                setShoppingListPrompt(shoppingListPrompt1);
-                console.log(shoppingListPrompt1);
+                const prompt = gptShoppingListPrompt(formatListAsSentence(dinners));
+                setShoppingListPrompt(prompt);
+                console.log(prompt);
 
-                const urls = await Promise.all(dinners.map(async mealName => {
-                    return await fetchGoogleImage(mealName, apiKey, cx);
-                }));
+                const urls = await fetchMealImages(dinners);
                 setImageUrls(urls);
 
-                await handleLlamaStreamQnA(shoppingListPrompt1, setresult1);
+                await handleLlamaStreamQnA(prompt, setresult1);
                 console.log("finised request 1")
 
                 await setShoppingListPrompt2(gptShoppingListPrompt2());
