@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import fetchGoogleImage from './fetchGoogleImage';
 import llamaStreamQnA from './createShoppingList.js';
-import { apiKey, cx } from './Private.js';
 import { selectNDinners, formatListAsSentence, gptShoppingListPrompt, gptShoppingListPrompt2 } from './fetchMeal.js';
 import './App.css';
 
 const App = () => {
+    const apiKey = process.env.REACT_APP_GOOGLE_CLOUD_API_KEY;
+    const cx = process.env.REACT_APP_CUSTOM_SEARCH_ENGINE_ID;
+
     const [numMeals, setNumMeals] = useState('');
     const [mealNames, setMealNames] = useState([]);
     const [tempMealNames, setTempMealNames] = useState([]);
@@ -86,25 +88,26 @@ const App = () => {
     }
 
     async function updateMeals() {
-            try {
-                await setMealNames(tempMealNames);
-                const prompt = gptShoppingListPrompt(formatListAsSentence(tempMealNames));
-                setShoppingListPrompt(prompt);
-                console.log(prompt);
+        try {
+            setMealNames(tempMealNames);
+            const prompt = gptShoppingListPrompt(formatListAsSentence(tempMealNames));
+            setShoppingListPrompt(prompt);
+            console.log(prompt);
 
-                const urls = await fetchMealImages(tempMealNames);
-                setImageUrls(urls);
+            const urls = await fetchMealImages(tempMealNames);
+            setImageUrls(urls);
 
-                await handleLlamaStreamQnA(prompt, setresult1);
-                console.log("finised request 1")
+            await handleLlamaStreamQnA(prompt, setresult1);
+            console.log("finised request 1")
 
-                await setShoppingListPrompt2(gptShoppingListPrompt2());
-                console.log("finised setting gptShoppingListPrompt2")
+            await setShoppingListPrompt2(gptShoppingListPrompt2());
+            console.log("finised setting gptShoppingListPrompt2")
 
-            } catch (error) {
+        } catch (error) {
                 console.error('Error:', error);
-            }
         }
+    }
+    
     const handleSearch = async () => {
         const numDinners = parseInt(numMeals, 10);
 
