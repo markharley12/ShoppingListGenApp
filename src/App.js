@@ -16,27 +16,27 @@ const App = () => {
     const [imageUrls, setImageUrls] = useState([]);
     const [result1, setresult1] = useState([]);
     const [result2, setresult2] = useState([]);
+    const [fetchImages, setFetchImages] = useState(false); // New state for toggling image fetching
 
     const AutoResizingTextArea = ({ label, content }) => {
         const textareaRef = useRef(null);
 
         useEffect(() => {
-            // This function adjusts the height of textarea to fit its content
             const adjustHeight = () => {
-            const textarea = textareaRef.current;
-            if (!textarea) return;
-            textarea.style.height = 'inherit'; // Reset height to recalibrate
-            textarea.style.height = `${textarea.scrollHeight}px`; // Set to scroll height
+                const textarea = textareaRef.current;
+                if (!textarea) return;
+                textarea.style.height = 'inherit';
+                textarea.style.height = `${textarea.scrollHeight}px`;
             };
 
             adjustHeight();
-        }, [content]); // Run the effect on content change
+        }, [content]);
 
         return (
             <textarea
-            readOnly
-            ref={textareaRef}
-            value={`${label} ${content}`}
+                readOnly
+                ref={textareaRef}
+                value={`${label} ${content}`}
             />
         );
     };
@@ -57,25 +57,26 @@ const App = () => {
     useEffect(() => {
         console.log(`useEffect Called ${result1.length} ${shoppingListPrompt2.length}`)
         const handlePrompts = async () => {
-            if (result1.length > 0 && result1 != "slot unavailable" && shoppingListPrompt2.length > 0) { // Check for non-empty
+            if (result1.length > 0 && result1 !== "slot unavailable" && shoppingListPrompt2.length > 0) {
                 console.log("Ready to process with updated prompts");
                 console.log("Waiting 5 secs for LLM api to refresh");
-                await sleep(5000); // Wait for 5 seconds
+                await sleep(5000);
     
                 await handleLlamaStreamQnA(prompt2(), setresult2);
             }
         };
     
         handlePrompts();
-    }, [result1, shoppingListPrompt2]); //Run the effect on change of result1 or shoppingListPrompt2
+    }, [result1, shoppingListPrompt2]);
 
     function prompt2() {
         const result1Str = Array.isArray(result1) ? result1.join(', ') : result1;
         const shoppingListPrompt2Str = Array.isArray(shoppingListPrompt2) ? shoppingListPrompt2.join(', ') : shoppingListPrompt2;
         return `My shopping list is: ${result1Str}\n\n Task:\n${shoppingListPrompt2Str}`;
-    }  
+    }
 
     async function fetchMealImages(mealNames) {
+        if (!fetchImages) return new Array(mealNames.length).fill(''); // Skip fetching images if toggled off
         try {
             const urls = await Promise.all(mealNames.map(async mealName => {
                 return await fetchGoogleImage(mealName, apiKey, cx);
@@ -83,7 +84,7 @@ const App = () => {
             return urls;
         } catch (error) {
             console.error('Error fetching images:', error);
-            return []; // Return an empty array as a fallback
+            return [];
         }
     }
 
@@ -98,13 +99,13 @@ const App = () => {
             setImageUrls(urls);
 
             await handleLlamaStreamQnA(prompt, setresult1);
-            console.log("finised request 1")
+            console.log("finished request 1")
 
             await setShoppingListPrompt2(gptShoppingListPrompt2());
-            console.log("finised setting gptShoppingListPrompt2")
+            console.log("finished setting gptShoppingListPrompt2")
 
         } catch (error) {
-                console.error('Error:', error);
+            console.error('Error:', error);
         }
     }
     
@@ -124,10 +125,10 @@ const App = () => {
                 setImageUrls(urls);
 
                 await handleLlamaStreamQnA(prompt, setresult1);
-                console.log("finised request 1")
+                console.log("finished request 1")
 
                 await setShoppingListPrompt2(gptShoppingListPrompt2());
-                console.log("finised setting gptShoppingListPrompt2")
+                console.log("finished setting gptShoppingListPrompt2")
 
             } catch (error) {
                 console.error('Error:', error);
@@ -145,6 +146,11 @@ const App = () => {
         <div className="App">
             <header className="App-header">
                 <h1>Shopping list generator App</h1>
+                <div className="toggle-images-container">
+                    <button onClick={() => setFetchImages(!fetchImages)}>
+                        {fetchImages ? "Disable Images" : "Enable Images"}
+                    </button>
+                </div>
             </header>
 
             <div className="input-container">
