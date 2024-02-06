@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import fetchGoogleImage from './fetchGoogleImage';
 import llamaStreamQnA from './createShoppingList.js';
+import placeholderImage from './images/mealPlaceHolder.webp';
 import { selectNDinners, formatListAsSentence, gptShoppingListPrompt, gptShoppingListPrompt2 } from './fetchMeal.js';
 import './App.css';
 
@@ -76,7 +77,7 @@ const App = () => {
     }
 
     async function fetchMealImages(mealNames) {
-        if (!fetchImages) return new Array(mealNames.length).fill(''); // Skip fetching images if toggled off
+        if (!fetchImages) return new Array(mealNames.length).fill(placeholderImage);
         try {
             const urls = await Promise.all(mealNames.map(async mealName => {
                 return await fetchGoogleImage(mealName, apiKey, cx);
@@ -182,7 +183,7 @@ const App = () => {
                             onChange={(e) => handleMealNameChange(e, index)} 
                             className="editable-meal-name"
                         />
-                        <img src={imageUrls[index]} alt={tempMealName} />
+                        <img src={imageUrls[index]} alt={tempMealName} className="meal-image" />
                     </div>
                 ))}
             </div>

@@ -112,3 +112,9 @@ img {
   width: 100%; /* Example to ensure image fits inside the container */
   height: auto; /* Keep the aspect ratio of the image */
 }
+
+.meal-image {
+  width: 100px; /* Adjust based on your layout */
+  height: 100px; /* Adjust to maintain aspect ratio or as needed */
+  object-fit: cover; /* This helps maintain aspect ratio */
+}
