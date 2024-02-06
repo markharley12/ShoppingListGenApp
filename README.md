@@ -1,70 +1,60 @@
-# Getting Started with Create React App
+# Shopping List Generator App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This Shopping List Generator App is a React-based web application that allows users to generate a shopping list based on selected meals. The app integrates with Google's Custom Search API to fetch images for each meal, enhancing the user experience by providing visual references. Users have the option to toggle image fetching to optimize performance or accommodate environments without Google API access.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- Generate a shopping list by selecting the number of meals.
+- Fetch and display images for each meal with an option to toggle this feature.
+- Update meal selections dynamically.
+- Responsive design for optimal viewing on all device sizes.
 
-### `npm start`
+## Setup
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+To run this app locally, follow these steps:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Prerequisites
 
-### `npm test`
+- Node.js installed on your machine.
+- A Google Cloud account with access to the Custom Search API and a configured Custom Search Engine (CSE).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Installation
 
-### `npm run build`
+Clone the repository:
+```bash
+git clone https://github.com/your-repository/shopping-list-generator-app.git
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Navigate to the app directory:
+```bash
+cd shopping-list-generator-app
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Install the dependencies:
+```bash
+npm install
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Create a .env file in the root of your project and add your Google Cloud API key and Custom Search Engine ID:
+```plaintext
+REACT_APP_GOOGLE_CLOUD_API_KEY=your_google_cloud_api_key
+REACT_APP_CUSTOM_SEARCH_ENGINE_ID=your_custom_search_engine_id
+```
 
-### `npm run eject`
+Start the app:
+```bash
+npm start
+```
+The app will launch in your browser at http://localhost:3000.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Usage
+Enter the number of meals for which you want to generate a shopping list.
+Click the "Generate New Meals" button to fetch meal names and their images (if image fetching is enabled).
+Use the "Update Meals" button if you wish to manually adjust the meal names and regenerate the list.
+Toggle the "Enable Images"/"Disable Images" button based on your preference to fetch images for the meals.
+Contributing
+Contributions to the Shopping List Generator App are welcome. Please follow the standard fork-branch-PR workflow.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Distributed under the MIT License. See LICENSE for more information.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Project Link: https://github.com/markharley12/ShoppingListGenApp
