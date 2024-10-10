@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const DEBUG = false;
-const llmApiUrl = "http://localhost:8001/completion"; // Replace with actual LLM API URL from your config
+const DEBUG = true;
+const llmApiUrl = "http://localhost:8001/v1/chat/completions"; // Replace with actual LLM API URL from your config
 let modelType = "zephyr";  // or "CodeLlama"
 
 const parseStreamStringToJson = (streamString) => {
@@ -41,7 +41,8 @@ const getInputJson = (input) => {
                     content: input,
                     role: "user"
                 }
-            ]
+            ],
+            "stream": true
         };
     } else {
         return {
@@ -77,11 +78,30 @@ const llamaStreamRequest = async function* (payload) {
         while (true) {
             const { value, done } = await reader.read();
             if (done) break;
-            let chunk = decoder.decode(value, {stream: true}); // Decode chunk as text
-            // Process the chunk using your parseStreamStringToJson function
-            let jsonContent = parseStreamStringToJson(chunk).content;
-            if (jsonContent) {
-                yield jsonContent; // Yield the JSON content
+            const chunk = decoder.decode(value, { stream: true }); // Decode chunk as text
+
+            // Split the incoming data into multiple parts in case there are multiple "data: " chunks
+            const parts = chunk.split('\n\n'); // Each chunk seems to be separated by two newlines
+            
+            for (let part of parts) {
+                // Ignore empty parts
+                if (!part.trim()) continue;
+                
+                // Remove the "data: " prefix
+                const cleanPart = part.trim().replace(/^data:\s*/, '');
+            
+                if (cleanPart === '[DONE]') break; // End of strea  m
+
+                try {
+                    const parsedChunk = JSON.parse(cleanPart);
+                    const content = parsedChunk.choices[0].delta.content;
+            
+                    if (content) {
+                        yield content; // Yield the content from each chunk
+                    }
+                } catch (error) {
+                    console.error(`Error parsing JSON in part: ${error}, part: ${cleanPart}`);
+                }
             }
         }
     } catch (e) {
