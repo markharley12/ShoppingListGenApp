@@ -1,17 +1,6 @@
-import axios from 'axios';
-
 const DEBUG = true;
-const llmApiUrl = "http://localhost:8001/v1/chat/completions"; // Replace with actual LLM API URL from your config
+const LLM_API_URL = process.env.REACT_APP_LLM_API_URL;
 let modelType = "zephyr";  // or "CodeLlama"
-
-const parseStreamStringToJson = (streamString) => {
-    try {
-        const removePrefix = streamString.substring(6);
-        return JSON.parse(removePrefix);
-    } catch (e) {
-        console.error(`Error parsing JSON from line: ${e}`);
-    }
-};
 
 const wrapPrompt = (basePrompt) => {
     switch(modelType) {
@@ -28,37 +17,28 @@ ${basePrompt}
     }
 };
 
-const getInputJson = (input) => {
-    // Replace this condition with your actual condition or configuration
-    if (llmApiUrl === "http://localhost:8001/v1/chat/completions") {
-        return {
-            messages: [
-                {
-                    content: "You are a helpful assistant.",
-                    role: "system"
-                },
-                {
-                    content: input,
-                    role: "user"
-                }
-            ],
-            "stream": true
-        };
-    } else {
-        return {
-            prompt: input,
-            max_tokens: 512,
-            stream: true
-        };
-    }
+const createInputJson = (input) => {
+    return {
+        messages: [
+            {
+                content: "You are a helpful assistant.",
+                role: "system"
+            },
+            {
+                content: input,
+                role: "user"
+            }
+        ],
+        stream: true
+    };
 };
 
 const llamaStreamRequest = async function* (payload) {
     if (DEBUG) {
-        console.log(`${llmApiUrl} : HTTP request POST : ${JSON.stringify(payload)}`);
+        console.log(`${LLM_API_URL} : HTTP request POST : ${JSON.stringify(payload)}`);
     }
     try {
-        const response = await fetch(llmApiUrl, {
+        const response = await fetch(LLM_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -108,13 +88,13 @@ const llamaStreamRequest = async function* (payload) {
         console.error(`An error occurred in llamaStreamRequest: ${e}`);
     }
 };
-
 // Modify llamaStreamQnA to be an async generator
-export default async function* llamaStreamQnA(question) {
-    for await (const messageStream of llamaStreamRequest(getInputJson(wrapPrompt(question)))) {
-        // process.stdout.write(messageStream);
-        // console.log(messageStream);
-        yield messageStream;  // Use yield to provide values to the for-await-of loop
+export default async function* llamaStreamQnA(input) {
+    const prompt = wrapPrompt(input);
+    const request = createInputJson(prompt);
+
+    for await (const message of llamaStreamRequest(request)) {
+        yield message;
     }
 }
 
@@ -130,6 +110,5 @@ const main = async () => {
 
     console.log("\n\nDone...");
 };
-
 // // Uncomment to run the main function
 // main();
