@@ -64,8 +64,8 @@ const llamaStreamRequest = async function* (payload) {
             const parts = chunk.split('\n\n'); // Each chunk seems to be separated by two newlines
             
             for (let part of parts) {
-                // Ignore empty parts
-                if (!part.trim()) continue;
+                // Ignore empty parts or parts that start with ": ping"
+                if (!part.trim() || part.startsWith(': ping')) continue;
                 
                 // Remove the "data: " prefix
                 const cleanPart = part.trim().replace(/^data:\s*/, '');
