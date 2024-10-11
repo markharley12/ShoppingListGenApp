@@ -1,0 +1,30 @@
+import llamaStreamQnA from './createShoppingList.js';
+import fetchGoogleImage from './fetchGoogleImage';
+import placeholderImage from './images/mealPlaceHolder.webp';
+
+const apiKey = process.env.REACT_APP_GOOGLE_CLOUD_API_KEY;
+const cx = process.env.REACT_APP_CUSTOM_SEARCH_ENGINE_ID;
+
+export const fetchBotMessages = async (prompt, setBotMessages) => {
+    setBotMessages("");
+    for await (const message of llamaStreamQnA(prompt)) {
+        setBotMessages((prevMessages) => prevMessages + message);
+    }
+};
+
+export function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async function fetchMealImages(mealNames, fetchImages) {
+    if (!fetchImages) return new Array(mealNames.length).fill(placeholderImage);
+    try {
+        const urls = await Promise.all(mealNames.map(async mealName => {
+            return await fetchGoogleImage(mealName, apiKey, cx);
+        }));
+        return urls;
+    } catch (error) {
+        console.error('Error fetching images:', error);
+        return [];
+    }
+}

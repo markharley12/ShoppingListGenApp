@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import fetchGoogleImage from './fetchGoogleImage';
-import llamaStreamQnA from './createShoppingList.js';
-import placeholderImage from './images/mealPlaceHolder.webp';
+import React, { useState, useEffect, useCallback } from 'react';
+import { fetchBotMessages, sleep, fetchMealImages } from './helperFunctions.js';
+import { AutoResizingTextArea } from './components.js';
 import { selectNDinners, formatListAsSentence, gptShoppingListPrompt, gptShoppingListPrompt2 } from './fetchMeal.js';
 import './App.css';
 
 const App = () => {
-    const apiKey = process.env.REACT_APP_GOOGLE_CLOUD_API_KEY;
-    const cx = process.env.REACT_APP_CUSTOM_SEARCH_ENGINE_ID;
 
     const [numMeals, setNumMeals] = useState('');
     const [mealNames, setMealNames] = useState([]);
@@ -19,75 +16,26 @@ const App = () => {
     const [result2, setresult2] = useState([]);
     const [fetchImages, setFetchImages] = useState(false); // New state for toggling image fetching
 
-    const AutoResizingTextArea = ({ label, content }) => {
-        const textareaRef = useRef(null);
-
-        useEffect(() => {
-            const adjustHeight = () => {
-                const textarea = textareaRef.current;
-                if (!textarea) return;
-                textarea.style.height = 'inherit';
-                textarea.style.height = `${textarea.scrollHeight}px`;
-            };
-
-            adjustHeight();
-        }, [content]);
-
-        return (
-            <textarea
-                readOnly
-                ref={textareaRef}
-                value={`${label} ${content}`}
-            />
-        );
-    };
-
-    const handleLlamaStreamQnA = async (prompt, setBotMessages) => {
-        console.log(`prompt:\n${prompt}`)
-        setBotMessages("")
-        for await (const message of llamaStreamQnA(prompt)) {
-            console.log(message);
-            setBotMessages(prev => prev + message);
-        }
-    };
-
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    useEffect(() => {
-        console.log(`useEffect Called ${result1.length} ${shoppingListPrompt2.length}`)
-        const handlePrompts = async () => {
-            if (result1.length > 0 && result1 !== "slot unavailable" && shoppingListPrompt2.length > 0) {
-                console.log("Ready to process with updated prompts");
-                console.log("Waiting 5 secs for LLM api to refresh");
-                await sleep(5000);
-    
-                await handleLlamaStreamQnA(prompt2(), setresult2);
-            }
-        };
-    
-        handlePrompts();
-    }, [result1, shoppingListPrompt2]);
-
-    function prompt2() {
+    const prompt2 = useCallback(() => {
         const result1Str = Array.isArray(result1) ? result1.join(', ') : result1;
         const shoppingListPrompt2Str = Array.isArray(shoppingListPrompt2) ? shoppingListPrompt2.join(', ') : shoppingListPrompt2;
         return `My shopping list is: ${result1Str}\n\n Task:\n${shoppingListPrompt2Str}`;
-    }
+    }, [result1, shoppingListPrompt2]);
 
-    async function fetchMealImages(mealNames) {
-        if (!fetchImages) return new Array(mealNames.length).fill(placeholderImage);
-        try {
-            const urls = await Promise.all(mealNames.map(async mealName => {
-                return await fetchGoogleImage(mealName, apiKey, cx);
-            }));
-            return urls;
-        } catch (error) {
-            console.error('Error fetching images:', error);
-            return [];
+    const handlePrompts = useCallback(async () => {
+        if (result1.length > 0 && result1 !== "slot unavailable" && shoppingListPrompt2.length > 0) {
+            console.log("Ready to process with updated prompts");
+            console.log("Waiting 5 secs for LLM api to refresh");
+            await sleep(5000);
+    
+            await fetchBotMessages(prompt2(), setresult2);
         }
-    }
+    }, [result1, shoppingListPrompt2, prompt2]);
+    
+    useEffect(() => {
+        console.log(`useEffect Called ${result1.length} ${shoppingListPrompt2.length}`);
+        handlePrompts();
+    }, [result1, shoppingListPrompt2, handlePrompts]);
 
     async function updateMeals() {
         try {
@@ -96,10 +44,10 @@ const App = () => {
             setShoppingListPrompt(prompt);
             console.log(prompt);
 
-            const urls = await fetchMealImages(tempMealNames);
+            const urls = await fetchMealImages(tempMealNames, fetchImages);
             setImageUrls(urls);
 
-            await handleLlamaStreamQnA(prompt, setresult1);
+            await fetchBotMessages(prompt, setresult1);
             console.log("finished request 1")
 
             await setShoppingListPrompt2(gptShoppingListPrompt2());
@@ -122,10 +70,10 @@ const App = () => {
                 setShoppingListPrompt(prompt);
                 console.log(prompt);
 
-                const urls = await fetchMealImages(dinners);
+                const urls = await fetchMealImages(dinners, fetchImages);
                 setImageUrls(urls);
 
-                await handleLlamaStreamQnA(prompt, setresult1);
+                await fetchBotMessages(prompt, setresult1);
                 console.log("finished request 1")
 
                 await setShoppingListPrompt2(gptShoppingListPrompt2());
