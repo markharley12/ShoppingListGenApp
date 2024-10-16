@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { fetchBotMessages, sleep, fetchMealImages } from './helperFunctions.js';
 import { AutoResizingTextField } from './components.js';
 import { selectNDinners, formatListAsSentence, gptShoppingListPrompt, gptShoppingListPrompt2 } from './fetchMeal.js';
-import { CssBaseline, Box, Button, TextField, Typography, FormControlLabel, Switch } from '@mui/material';
-import { lightTheme, darkTheme } from './theme'; // Adjust path as needed
+import { Box, Button, TextField, Typography, FormControlLabel, Switch } from '@mui/material';
 import { useTheme } from './themeContext.js';
 
 
@@ -95,33 +94,104 @@ const App = () => {
     };
 
 
-
-    return (
-        <>
-            <CssBaseline />
-            <Box sx={{ textAlign: 'center', bgcolor: 'background.default', minHeight: '10vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white', width: '100%', boxSizing: 'border-box' }}>
-                <Typography variant="h8" sx={{ fontSize: 'calc(15px + 2vmin)' }}>Shopping List Generator App</Typography>
+    /**
+     * Returns a Box component with a centered Typography component 
+     * displaying the name of the application.
+     * 
+     * The Box component has a minimum height of 10vh and takes up the full width of the screen.
+     * The Typography component has a font size that scales with the viewport size.
+     * The font size calculation is based on the formula: 15px + 2vmin
+     * 
+     * @returns {ReactElement} A Box component with a centered Typography component
+     */
+    const renderHeader = () => {
+        return (
+        <Box sx={{ textAlign: 'center', minHeight: '10vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', boxSizing: 'border-box' }}>
+            <Typography variant="h8" sx={{ fontSize: 'calc(15px + 2vmin)' }}>Shopping List Generator App</Typography>
+        </Box>
+        )
+    }
+    /**
+     * Returns a Box component containing a FormControlLabel that toggles dark mode.
+     * 
+     * The Box component is a flex box with its content aligned to the right and has a padding of 2.
+     * The FormControlLabel component toggles the dark mode state when clicked.
+     * The label for the FormControlLabel component is "Dark Mode".
+     * 
+     * @returns {ReactElement} A Box component containing a FormControlLabel that toggles dark mode.
+     */
+    const renderThemeToggle = () => {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: 2 }}>
+                <FormControlLabel 
+                    control={<Switch checked={isDarkMode} onChange={toggleTheme} />}
+                    label="Dark Mode"
+                />
             </Box>
+        )
+    }
 
-            <FormControlLabel
-                control={<Switch checked={isDarkMode} onChange={toggleTheme} />}
-                label="Dark Mode"
-            />
-
-            <Box sx={{ padding: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    /**
+     * Renders a Box component with a centered form for the user to enter
+     * the number of meals they want to generate.
+     * 
+     * The Box component has a fixed height of 6.5rem, a padding of 2rem, 
+     * and a display of flex. The form is centered horizontally and 
+     * vertically within the Box.
+     * 
+     * The form consists of a TextField component for the user to enter 
+     * the number of meals and a Button component to trigger the generation 
+     * of the meals. The TextField component has a type of number, a 
+     * placeholder of "Enter number of meals", and an onChange event 
+     * handler. The Button component has a variant of contained and an 
+     * onClick event handler to trigger the generation of the meals.
+     * 
+     * The TextField and Button components are spaced evenly within the 
+     * Box.
+     * 
+     * @returns {ReactElement} A Box component with a centered form for generating meals
+     */
+    const renderMealGenerator = () => {
+        return (
+            <Box sx={{ padding: 2, display: 'flex', justifyContent: 'center', alignItems: 'stretch', height: '6.5rem', gap: 1 }}>
                 <TextField
-                    type="text"
+                    type="number"
                     value={numMeals}
                     onChange={(e) => setNumMeals(e.target.value)}
                     placeholder="Enter number of meals"
                     variant="outlined"
-                    sx={{ marginRight: 1 }}
+                    slotProps={{
+                        input: {
+                            sx: {
+                                height: '100%',
+                                textAlign: 'center',
+                                '& input': {
+                                    height: '100%',
+                                    textAlign: 'center',
+                                }
+                            }
+                        }
+                    }}
                     />
-                <Button variant="contained" onClick={handleSearch}>
+                <Button variant="contained" onClick={handleSearch} sx={{ height: '100%' }}>
                     Generate New Meals
                 </Button>
             </Box>
+        )
+    }
 
+    /**
+     * Renders a row of buttons for toggling image fetching and updating the meals.
+     * 
+     * The first button toggles image fetching on and off, and the second button
+     * triggers the generation of new meals.
+     * 
+     * The buttons are centered horizontally and have a padding of 2rem.
+     * 
+     * @returns {ReactElement} A row of buttons for toggling image fetching and updating the meals
+     */
+    const renderImageToggle = () => {
+        return (
             <Box sx={{ padding: 2, textAlign: 'center' }}>
                 <Button variant="outlined" onClick={() => setFetchImages(!fetchImages)} sx={{ marginRight: 1 }}>
                     {fetchImages ? "Disable Images" : "Enable Images"}
@@ -130,7 +200,27 @@ const App = () => {
                     Update Meals
                 </Button>
             </Box>
+        )
+    }
 
+    /**
+     * A function that renders a row of meal images.
+     * 
+     * It takes in the temporary meal names and URLs of the meal images,
+     * and renders a row of images with editable text fields above each image.
+     * 
+     * The images are displayed in a flex box with a flex direction of 'row' and flex wrap set to 'wrap'.
+     * The images are centered and have a margin of 1.
+     * 
+     * The text fields are also centered and have a margin bottom of 1.
+     * The text fields are editable and have a variant of 'outlined'.
+     * 
+     * The function also applies a class name of 'editable-meal-name' to the text fields and 'meal-image' to the images.
+     * 
+     * @returns {ReactElement} A Box component with a flex box inside that renders the meal images and text fields.
+     */
+    const renderMealImageRow = () => {
+        return (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 2 }}>
                 <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
                     {tempMealNames.map((tempMealName, index) => (
@@ -148,7 +238,25 @@ const App = () => {
                     ))}
                 </Box>
             </Box>
+        )
+    }
 
+    /**
+     * Returns a Box component that renders a vertical column of AutoResizingTextFields
+     * for the user to input their prompts and the bot to output its responses.
+     *
+     * The first AutoResizingTextField is for the user to input their first prompt.
+     * The second AutoResizingTextField is read-only and displays the bot's response to the user's first prompt.
+     * The third AutoResizingTextField is for the user to input their second prompt.
+     * The fourth AutoResizingTextField is read-only and displays the bot's response to the user's second prompt.
+     *
+     * The AutoResizingTextFields are all centered horizontally and have a width of 95% of the parent.
+     * The padding is set to 2 on all sides.
+     *
+     * @returns {ReactElement} A Box component with four AutoResizingTextFields
+     */
+    const renderShoppingList = () => {
+        return (
             <Box sx={{ padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <AutoResizingTextField
                     label="[User]"
@@ -171,6 +279,22 @@ const App = () => {
                     onChange={() => {}} // No change handler, as it's read-only
                     />
             </Box>
+        )
+    }
+
+    return (
+        <>
+            {renderHeader()}
+
+            {renderThemeToggle()}
+
+            {renderMealGenerator()}
+
+            {renderImageToggle()}
+
+            {renderMealImageRow()}
+
+            {renderShoppingList()}
         </>
     );
 };

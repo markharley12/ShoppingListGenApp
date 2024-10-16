@@ -3,11 +3,13 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ThemeProvider as CustomThemeProvider } from './themeContext.js';
+import CssBaseline from '@mui/material/CssBaseline';  // Import CssBaseline
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <CustomThemeProvider>
     <React.StrictMode>
+      <CssBaseline /> {/* Add CssBaseline here */}
       <App />
     </React.StrictMode>
   </CustomThemeProvider>
