@@ -6,11 +6,16 @@ const apiKey = process.env.REACT_APP_GOOGLE_CLOUD_API_KEY;
 const cx = process.env.REACT_APP_CUSTOM_SEARCH_ENGINE_ID;
 
 export const fetchBotMessages = async (prompt, setBotMessages) => {
-    setBotMessages("");
-    for await (const message of llamaStreamQnA(prompt)) {
+    try {
+      setBotMessages('');
+      for await (const message of llamaStreamQnA(prompt)) {
         setBotMessages((prevMessages) => prevMessages + message);
+      }
+    } catch (error) {
+      console.error('Error fetching bot messages:', error);
+      setBotMessages('Error fetching data. Please try again.');
     }
-};
+  };
 
 export function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));

@@ -5,8 +5,8 @@ import {
   formatListAsSentence,
   gptShoppingListPrompt,
   gptShoppingListPrompt2,
+  gptMacroPrompt, // Import the new prompt function
 } from './helpers/fetchMeal';
-import { useTheme } from './themes/themeContext';
 
 import Header from './components/Header';
 import ThemeToggle from './components/ThemeToggle';
@@ -14,6 +14,7 @@ import MealGenerator from './components/MealGenerator';
 import ImageToggle from './components/ImageToggle';
 import MealImageRow from './components/MealImageRow';
 import ShoppingList from './components/ShoppingList';
+import MacrosDisplay from './components/MacrosDisplay'; // Import the new component
 
 const App = () => {
   const [numMeals, setNumMeals] = useState('');
@@ -25,6 +26,7 @@ const App = () => {
   const [result1, setResult1] = useState('');
   const [result2, setResult2] = useState('');
   const [fetchImages, setFetchImages] = useState(false);
+  const [macros, setMacros] = useState(''); // New state variable for macros
 
   const prompt2 = useCallback(() => {
     return `My shopping list is: ${result1}\n\n Task:\n${shoppingListPrompt2}`;
@@ -47,15 +49,21 @@ const App = () => {
   const updateMeals = async () => {
     try {
       setMealNames(tempMealNames);
-      const prompt = gptShoppingListPrompt(formatListAsSentence(tempMealNames));
-      setShoppingListPrompt(prompt);
+      const mealNamesSentence = formatListAsSentence(tempMealNames);
+      const shoppingPrompt = gptShoppingListPrompt(mealNamesSentence);
+      setShoppingListPrompt(shoppingPrompt);
 
       const urls = await fetchMealImages(tempMealNames, fetchImages);
       setImageUrls(urls);
 
-      await fetchBotMessages(prompt, setResult1);
+      // Fetch shopping list
+      await fetchBotMessages(shoppingPrompt, setResult1);
 
       setShoppingListPrompt2(gptShoppingListPrompt2());
+
+      // Fetch macros
+      const macroPrompt = gptMacroPrompt(mealNamesSentence);
+      await fetchBotMessages(macroPrompt, setMacros);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -69,18 +77,34 @@ const App = () => {
         const dinners = await selectNDinners(numDinners, './lists/Dinners.md');
         setMealNames(dinners);
         setTempMealNames(dinners);
-        const prompt = gptShoppingListPrompt(formatListAsSentence(dinners));
-        setShoppingListPrompt(prompt);
+        const mealNamesSentence = formatListAsSentence(dinners);
+        const shoppingPrompt = gptShoppingListPrompt(mealNamesSentence);
+        setShoppingListPrompt(shoppingPrompt);
 
         const urls = await fetchMealImages(dinners, fetchImages);
         setImageUrls(urls);
 
-        await fetchBotMessages(prompt, setResult1);
+        // Fetch shopping list
+        await fetchBotMessages(shoppingPrompt, setResult1);
 
         setShoppingListPrompt2(gptShoppingListPrompt2());
+
+        // Fetch macros
+        const macroPrompt = gptMacroPrompt(mealNamesSentence);
+        await fetchBotMessages(macroPrompt, setMacros);
       } catch (error) {
         console.error('Error:', error);
       }
+    }
+  };
+
+  const fetchMacros = async () => {
+    try {
+      const mealNamesSentence = formatListAsSentence(tempMealNames);
+      const macroPrompt = gptMacroPrompt(mealNamesSentence);
+      await fetchBotMessages(macroPrompt, setMacros);
+    } catch (error) {
+      console.error('Error fetching macros:', error);
     }
   };
 
@@ -99,6 +123,7 @@ const App = () => {
         fetchImages={fetchImages}
         setFetchImages={setFetchImages}
         updateMeals={updateMeals}
+        fetchMacros={fetchMacros}
       />
       <MealImageRow
         tempMealNames={tempMealNames}
@@ -113,6 +138,7 @@ const App = () => {
         setShoppingListPrompt2={setShoppingListPrompt2}
         result2={result2}
       />
+      <MacrosDisplay macros={macros} />
     </>
   );
 };

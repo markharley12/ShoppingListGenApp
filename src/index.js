@@ -9,7 +9,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <CustomThemeProvider>
     <React.StrictMode>
-      <CssBaseline /> {/* Add CssBaseline here */}
+      <CssBaseline />
       <App />
     </React.StrictMode>
   </CustomThemeProvider>

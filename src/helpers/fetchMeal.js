@@ -50,6 +50,10 @@ export function gptShoppingListPrompt2() {
     return "List just the ingredients in one long list, grouping similar items with subheadings for the item types"
 }
 
+export const gptMacroPrompt = (mealNamesSentence) => {
+    return `For each of the following meals, please provide a brief description and their macronutrient breakdown (proteins, carbohydrates, fats) per serving. Meals: ${mealNamesSentence}`;
+  };
+
 // Test the function - useful for debugging
 // async function printTest() {
 //     const dinners = await selectNDinners(3);
