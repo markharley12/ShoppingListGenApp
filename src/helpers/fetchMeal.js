@@ -1,4 +1,4 @@
-const dinnerList = require('./lists/Dinners.json');
+const dinnerList = require('../lists/Dinners.json');
 
 /**
  * Shuffles an array using Fisher-Yates algorithm.

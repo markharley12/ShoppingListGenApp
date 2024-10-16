@@ -1,6 +1,6 @@
 import llamaStreamQnA from './createShoppingList.js';
-import fetchGoogleImage from './fetchGoogleImage';
-import placeholderImage from './images/mealPlaceHolder.webp';
+import fetchGoogleImage from './fetchGoogleImage.js';
+import placeholderImage from '../images/mealPlaceHolder.webp';
 
 const apiKey = process.env.REACT_APP_GOOGLE_CLOUD_API_KEY;
 const cx = process.env.REACT_APP_CUSTOM_SEARCH_ENGINE_ID;

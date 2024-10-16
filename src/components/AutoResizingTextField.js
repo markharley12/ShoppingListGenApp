@@ -1,28 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { TextField } from '@mui/material';
-
-export const AutoResizingTextArea = ({ label, content }) => {
-    const textareaRef = useRef(null);
-
-    useEffect(() => {
-        const adjustHeight = () => {
-            const textarea = textareaRef.current;
-            if (!textarea) return;
-            textarea.style.height = 'inherit';
-            textarea.style.height = `${textarea.scrollHeight}px`;
-        };
-
-        adjustHeight();
-    }, [content]);
-
-    return (
-        <textarea
-            readOnly
-            ref={textareaRef}
-            value={`${label} ${content}`}
-        />
-    );
-};
 
 /**
  * A text field that automatically adjusts its height to fit its content.
@@ -37,9 +14,9 @@ export const AutoResizingTextArea = ({ label, content }) => {
  */
 
 export const AutoResizingTextField = ({ label, value, onChange }) => {
-    const textAreaRef = useRef(null);
+    const textAreaRef = React.useRef(null);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (textAreaRef.current) {
             // Reset height to enable shrinking and then set it based on scrollHeight
             textAreaRef.current.style.height = 'auto';
@@ -58,9 +35,14 @@ export const AutoResizingTextField = ({ label, value, onChange }) => {
             value={value}
             onChange={onChange}
             maxRows={6} // Limit to 6 rows to avoid excessive height
-            InputProps={{
-                style: { overflow: 'hidden', resize: 'none' } // Prevent manual resize
+            slotProps={{
+                input: {
+                  sx: {
+                    style: { overflow: 'hidden', resize: 'none' } // Prevent manual resize
+                }}
             }}
         />
     );
 };
+
+export default AutoResizingTextField;
