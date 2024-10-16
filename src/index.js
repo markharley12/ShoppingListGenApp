@@ -1,16 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import App from './App';
-import MyComponent from './stateTest';
 import reportWebVitals from './reportWebVitals';
+import { ThemeProvider as CustomThemeProvider } from './themeContext.js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-    {/* <MyComponent/> */}
-  </React.StrictMode>
+  <CustomThemeProvider>
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  </CustomThemeProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

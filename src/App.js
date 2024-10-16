@@ -1,19 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchBotMessages, sleep, fetchMealImages } from './helperFunctions.js';
-import { AutoResizingTextArea } from './components.js';
+import { AutoResizingTextField } from './components.js';
 import { selectNDinners, formatListAsSentence, gptShoppingListPrompt, gptShoppingListPrompt2 } from './fetchMeal.js';
-import './App.css';
+import { CssBaseline, Box, Button, TextField, Typography, FormControlLabel, Switch } from '@mui/material';
+import { lightTheme, darkTheme } from './theme'; // Adjust path as needed
+import { useTheme } from './themeContext.js';
+
 
 const App = () => {
-
+    const { isDarkMode, toggleTheme } = useTheme();
     const [numMeals, setNumMeals] = useState('');
     const [mealNames, setMealNames] = useState([]);
     const [tempMealNames, setTempMealNames] = useState([]);
     const [shoppingListPrompt, setShoppingListPrompt] = useState([]);
     const [shoppingListPrompt2, setShoppingListPrompt2] = useState([]);
     const [imageUrls, setImageUrls] = useState([]);
-    const [result1, setresult1] = useState([]);
-    const [result2, setresult2] = useState([]);
+    const [result1, setResult1] = useState([]);
+    const [result2, setResult2] = useState([]);
     const [fetchImages, setFetchImages] = useState(false); // New state for toggling image fetching
 
     const prompt2 = useCallback(() => {
@@ -28,7 +31,7 @@ const App = () => {
             console.log("Waiting 5 secs for LLM api to refresh");
             await sleep(5000);
     
-            await fetchBotMessages(prompt2(), setresult2);
+            await fetchBotMessages(prompt2(), setResult2);
         }
     }, [result1, shoppingListPrompt2, prompt2]);
     
@@ -47,7 +50,7 @@ const App = () => {
             const urls = await fetchMealImages(tempMealNames, fetchImages);
             setImageUrls(urls);
 
-            await fetchBotMessages(prompt, setresult1);
+            await fetchBotMessages(prompt, setResult1);
             console.log("finished request 1")
 
             await setShoppingListPrompt2(gptShoppingListPrompt2());
@@ -73,7 +76,7 @@ const App = () => {
                 const urls = await fetchMealImages(dinners, fetchImages);
                 setImageUrls(urls);
 
-                await fetchBotMessages(prompt, setresult1);
+                await fetchBotMessages(prompt, setResult1);
                 console.log("finished request 1")
 
                 await setShoppingListPrompt2(gptShoppingListPrompt2());
@@ -91,58 +94,84 @@ const App = () => {
         setTempMealNames(updatedTempMealNames);
     };
 
-    return (
-        <div className="App">
-            <header className="App-header">
-                <h1>Shopping list generator App</h1>
-                <div className="toggle-images-container">
-                    <button onClick={() => setFetchImages(!fetchImages)}>
-                        {fetchImages ? "Disable Images" : "Enable Images"}
-                    </button>
-                </div>
-            </header>
 
-            <div className="input-container">
-                <input
+
+    return (
+        <>
+            <CssBaseline />
+            <Box sx={{ textAlign: 'center', bgcolor: 'background.default', minHeight: '10vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white', width: '100%', boxSizing: 'border-box' }}>
+                <Typography variant="h8" sx={{ fontSize: 'calc(15px + 2vmin)' }}>Shopping List Generator App</Typography>
+            </Box>
+
+            <FormControlLabel
+                control={<Switch checked={isDarkMode} onChange={toggleTheme} />}
+                label="Dark Mode"
+            />
+
+            <Box sx={{ padding: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <TextField
                     type="text"
                     value={numMeals}
                     onChange={(e) => setNumMeals(e.target.value)}
                     placeholder="Enter number of meals"
-                />
-                <div className='SearchButton'>
-                    <button onClick={handleSearch}>
-                        Generate New Meals
-                    </button>
-                </div>
-            </div>
+                    variant="outlined"
+                    sx={{ marginRight: 1 }}
+                    />
+                <Button variant="contained" onClick={handleSearch}>
+                    Generate New Meals
+                </Button>
+            </Box>
 
-            <div className="update-meals-container">
-                <button onClick={updateMeals}>
+            <Box sx={{ padding: 2, textAlign: 'center' }}>
+                <Button variant="outlined" onClick={() => setFetchImages(!fetchImages)} sx={{ marginRight: 1 }}>
+                    {fetchImages ? "Disable Images" : "Enable Images"}
+                </Button>
+                <Button variant="outlined" onClick={updateMeals}>
                     Update Meals
-                </button>
-            </div>
+                </Button>
+            </Box>
 
-            <div className="row-container">
-                {tempMealNames.map((tempMealName, index) => (
-                    <div key={index} className="meal-card">
-                        <input 
-                            type="text" 
-                            value={tempMealName}
-                            onChange={(e) => handleMealNameChange(e, index)} 
-                            className="editable-meal-name"
-                        />
-                        <img src={imageUrls[index]} alt={tempMealName} className="meal-image" />
-                    </div>
-                ))}
-            </div>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    {tempMealNames.map((tempMealName, index) => (
+                        <Box key={index} sx={{ display: 'flex', flexDirection: 'column', margin: 1 }}>
+                            <TextField
+                                type="text"
+                                value={tempMealName}
+                                onChange={(e) => handleMealNameChange(e, index)}
+                                sx={{ marginBottom: 1 }}
+                                variant="outlined"
+                                className="editable-meal-name"
+                                />
+                            <img src={imageUrls[index]} alt={tempMealName} style={{ width: '100px', height: '100px', objectFit: 'cover' }} className="meal-image" />
+                        </Box>
+                    ))}
+                </Box>
+            </Box>
 
-            <div className="prompt-container">
-                <AutoResizingTextArea label="[User]" content={shoppingListPrompt} />
-                <AutoResizingTextArea label="[Bot]" content={result1} />
-                <AutoResizingTextArea label="[User]" content={shoppingListPrompt2} />
-                <AutoResizingTextArea label="[Bot]" content={result2} />
-            </div>
-        </div>
+            <Box sx={{ padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <AutoResizingTextField
+                    label="[User]"
+                    value={shoppingListPrompt}
+                    onChange={(e) => setShoppingListPrompt(e.target.value)}
+                    />
+                <AutoResizingTextField
+                    label="[Bot]"
+                    value={result1}
+                    onChange={() => {}} // No change handler, as it's read-only
+                    />
+                <AutoResizingTextField
+                    label="[User]"
+                    value={shoppingListPrompt2}
+                    onChange={(e) => setShoppingListPrompt2(e.target.value)}
+                />
+                <AutoResizingTextField
+                    label="[Bot]"
+                    value={result2}
+                    onChange={() => {}} // No change handler, as it's read-only
+                    />
+            </Box>
+        </>
     );
 };
 
