@@ -34,7 +34,6 @@ export const AutoResizingTextField = ({ label, value, onChange }) => {
             sx={{ width: '95%', marginBottom: 2 }}
             value={value}
             onChange={onChange}
-            maxRows={6} // Limit to 6 rows to avoid excessive height
             slotProps={{
                 input: {
                   sx: {

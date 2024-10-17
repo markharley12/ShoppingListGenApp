@@ -1,6 +1,4 @@
 const DEBUG = true;
-const LLM_API_URL = process.env.REACT_APP_LLM_API_URL;
-const LLM_API_KEY = process.env.REACT_APP_LLM_API_KEY;
 let modelType = "zephyr";  // or "CodeLlama"
 
 const wrapPrompt = (basePrompt) => {
@@ -37,16 +35,16 @@ const createInputJson = (input) => {
     };
 };
 
-const llamaStreamRequest = async function* (payload) {
+const llamaStreamRequest = async function* (payload, llmApiUrl, llmApiKey) {
     if (DEBUG) {
-        console.log(`${LLM_API_URL} : HTTP request POST : ${JSON.stringify(payload)}`);
+        console.log(`${llmApiUrl} : HTTP request POST : ${JSON.stringify(payload)}`);
     }
     try {
-        const response = await fetch(LLM_API_URL, {
+        const response = await fetch(llmApiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${LLM_API_KEY}`,
+                'Authorization': `Bearer ${llmApiKey}`,
             },
             body: JSON.stringify(payload),
         });
@@ -75,7 +73,7 @@ const llamaStreamRequest = async function* (payload) {
                 // Remove the "data: " prefix
                 const cleanPart = part.trim().replace(/^data:\s*/, '');
             
-                if (cleanPart === '[DONE]') break; // End of strea  m
+                if (cleanPart === '[DONE]') break;
 
                 try {
                     const parsedChunk = JSON.parse(cleanPart);
@@ -93,12 +91,11 @@ const llamaStreamRequest = async function* (payload) {
         console.error(`An error occurred in llamaStreamRequest: ${e}`);
     }
 };
-// Modify llamaStreamQnA to be an async generator
-export default async function* llamaStreamQnA(input) {
+export default async function* llamaStreamQnA(input, llmApiUrl, llmApiKey) {
     const prompt = wrapPrompt(input);
     const request = createInputJson(prompt);
 
-    for await (const message of llamaStreamRequest(request)) {
+    for await (const message of llamaStreamRequest(request, llmApiUrl, llmApiKey)) {
         yield message;
     }
 }
@@ -110,8 +107,8 @@ const main = async () => {
     process.stdout.write("[Bot] ")
 
     for await (const message of llamaStreamQnA(inputStr)) {
-            process.stdout.write(JSON.stringify(message));
-        }
+        process.stdout.write(JSON.stringify(message));
+    }
 
     console.log("\n\nDone...");
 };

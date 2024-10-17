@@ -28,6 +28,9 @@ const App = () => {
   const fetchImages = useSelector((state) => state.settings.fetchImages);
   const [macros, setMacros] = useState('');
 
+  const llmApiUrl = useSelector((state) => state.settings.llmApiUrl);
+  const llmApiKey = useSelector((state) => state.settings.llmApiKey);
+
   const prompt2 = useCallback(() => {
     return `My shopping list is: ${result1}\n\n Task:\n${shoppingListPrompt2}`;
   }, [result1, shoppingListPrompt2]);
@@ -38,7 +41,7 @@ const App = () => {
       console.log('Waiting 5 secs for LLM API to refresh');
       await sleep(5000);
 
-      await fetchBotMessages(prompt2(), setResult2);
+      await fetchBotMessages(prompt2(), setResult2, llmApiUrl, llmApiKey);
     }
   }, [result1, shoppingListPrompt2, prompt2]);
 
@@ -57,13 +60,13 @@ const App = () => {
       setImageUrls(urls);
 
       // Fetch shopping list
-      await fetchBotMessages(shoppingPrompt, setResult1);
+      await fetchBotMessages(shoppingPrompt, setResult1, llmApiUrl, llmApiKey);
 
       setShoppingListPrompt2(gptShoppingListPrompt2());
 
       // Fetch macros
       const macroPrompt = gptMacroPrompt(mealNamesSentence);
-      await fetchBotMessages(macroPrompt, setMacros);
+      await fetchBotMessages(macroPrompt, setMacros, llmApiUrl, llmApiKey);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -85,13 +88,13 @@ const App = () => {
         setImageUrls(urls);
 
         // Fetch shopping list
-        await fetchBotMessages(shoppingPrompt, setResult1);
+        await fetchBotMessages(shoppingPrompt, setResult1, llmApiUrl, llmApiKey);
 
         setShoppingListPrompt2(gptShoppingListPrompt2());
 
         // Fetch macros
         const macroPrompt = gptMacroPrompt(mealNamesSentence);
-        await fetchBotMessages(macroPrompt, setMacros);
+        await fetchBotMessages(macroPrompt, setMacros, llmApiUrl, llmApiKey);
       } catch (error) {
         console.error('Error:', error);
       }
@@ -102,7 +105,7 @@ const App = () => {
     try {
       const mealNamesSentence = formatListAsSentence(tempMealNames);
       const macroPrompt = gptMacroPrompt(mealNamesSentence);
-      await fetchBotMessages(macroPrompt, setMacros);
+      await fetchBotMessages(macroPrompt, setMacros, llmApiUrl, llmApiKey);
     } catch (error) {
       console.error('Error fetching macros:', error);
     }

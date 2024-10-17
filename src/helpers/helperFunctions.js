@@ -5,11 +5,11 @@ import placeholderImage from '../images/mealPlaceHolder.webp';
 const apiKey = process.env.REACT_APP_GOOGLE_CLOUD_API_KEY;
 const cx = process.env.REACT_APP_CUSTOM_SEARCH_ENGINE_ID;
 
-export const fetchBotMessages = async (prompt, setBotMessages) => {
-    try {
+export const fetchBotMessages = async (prompt, setBotMessages, llmApiUrl, llmApiKey) => {
+  try {
       setBotMessages('');
-      for await (const message of llamaStreamQnA(prompt)) {
-        setBotMessages((prevMessages) => prevMessages + message);
+      for await (const message of llamaStreamQnA(prompt, llmApiUrl, llmApiKey)) {
+          setBotMessages((prevMessages) => prevMessages + message);
       }
     } catch (error) {
       console.error('Error fetching bot messages:', error);
