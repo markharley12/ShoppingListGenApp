@@ -5,7 +5,7 @@ import {
   formatListAsSentence,
   gptShoppingListPrompt,
   gptShoppingListPrompt2,
-  gptMacroPrompt, // Import the new prompt function
+  gptMacroPrompt,
 } from './helpers/fetchMeal';
 
 import Header from './components/Header';
@@ -14,8 +14,9 @@ import MealGenerator from './components/MealGenerator';
 import ImageToggle from './components/ImageToggle';
 import MealImageRow from './components/MealImageRow';
 import ShoppingList from './components/ShoppingList';
-import MacrosDisplay from './components/MacrosDisplay'; // Import the new component
-
+import MacrosDisplay from './components/MacrosDisplay';
+import Settings from './components/Settings';
+import { Box } from '@mui/material';
 const App = () => {
   const [numMeals, setNumMeals] = useState('');
   const [mealNames, setMealNames] = useState([]);
@@ -26,7 +27,7 @@ const App = () => {
   const [result1, setResult1] = useState('');
   const [result2, setResult2] = useState('');
   const [fetchImages, setFetchImages] = useState(false);
-  const [macros, setMacros] = useState(''); // New state variable for macros
+  const [macros, setMacros] = useState('');
 
   const prompt2 = useCallback(() => {
     return `My shopping list is: ${result1}\n\n Task:\n${shoppingListPrompt2}`;
@@ -117,6 +118,7 @@ const App = () => {
   return (
     <>
       <Header />
+      <Settings fetchImages={fetchImages} setFetchImages={setFetchImages} />
       <ThemeToggle />
       <MealGenerator numMeals={numMeals} setNumMeals={setNumMeals} handleSearch={handleSearch} />
       <ImageToggle
