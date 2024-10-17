@@ -1,8 +1,9 @@
 // components/Settings.js
 import React, { useState } from 'react';
 import Drawer from '@mui/material/Drawer';
-import { Box, IconButton } from '@mui/material';
+import { IconButton, FormControlLabel, Switch } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import ThemeToggle from './ThemeToggle';
 
 const Settings = ({ fetchImages, setFetchImages }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -22,16 +23,13 @@ const Settings = ({ fetchImages, setFetchImages }) => {
       <Drawer anchor="left" open={isVisible} onClose={toggleVisibility}>
         <div style={{ width: '250px', padding: '1rem' }}>
           <h2>Settings</h2>
-          <label>
-            <input
-              type="checkbox"
-              checked={fetchImages}
-              onChange={(e) => setFetchImages(e.target.checked)}
+            <ThemeToggle />
+            <FormControlLabel
+                control={<Switch checked={fetchImages} onChange={(e) => setFetchImages(e.target.checked)} />}
+                label="Enable Images"
             />
-            Fetch Meal Images
-          </label>
           {/* Add more settings here as needed */}
-        </div>
+      </div>
       </Drawer>
     </>
   );

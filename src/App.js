@@ -9,7 +9,6 @@ import {
 } from './helpers/fetchMeal';
 
 import Header from './components/Header';
-import ThemeToggle from './components/ThemeToggle';
 import MealGenerator from './components/MealGenerator';
 import ImageToggle from './components/ImageToggle';
 import MealImageRow from './components/MealImageRow';
@@ -119,7 +118,6 @@ const App = () => {
     <>
       <Header />
       <Settings fetchImages={fetchImages} setFetchImages={setFetchImages} />
-      <ThemeToggle />
       <MealGenerator numMeals={numMeals} setNumMeals={setNumMeals} handleSearch={handleSearch} />
       <ImageToggle
         fetchImages={fetchImages}

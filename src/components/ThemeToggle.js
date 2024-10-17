@@ -9,7 +9,7 @@ const ThemeToggle = () => {
   const { isDarkMode, toggleTheme } = useTheme();
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: 2 }}>
+    <Box>
       <FormControlLabel
         control={<Switch checked={isDarkMode} onChange={toggleTheme} />}
         label="Dark Mode"
