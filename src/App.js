@@ -30,6 +30,8 @@ const App = () => {
 
   const llmApiUrl = useSelector((state) => state.settings.llmApiUrl);
   const llmApiKey = useSelector((state) => state.settings.llmApiKey);
+  const apiKey = useSelector((state) => state.settings.apiKey);
+  const cx = useSelector((state) => state.settings.cx);
 
   const prompt2 = useCallback(() => {
     return `My shopping list is: ${result1}\n\n Task:\n${shoppingListPrompt2}`;
@@ -56,7 +58,7 @@ const App = () => {
       const shoppingPrompt = gptShoppingListPrompt(mealNamesSentence);
       setShoppingListPrompt(shoppingPrompt);
 
-      const urls = await fetchMealImages(tempMealNames, fetchImages);
+      const urls = await fetchMealImages(tempMealNames, fetchImages, apiKey, cx);
       setImageUrls(urls);
 
       // Fetch shopping list
@@ -84,7 +86,7 @@ const App = () => {
         const shoppingPrompt = gptShoppingListPrompt(mealNamesSentence);
         setShoppingListPrompt(shoppingPrompt);
 
-        const urls = await fetchMealImages(dinners, fetchImages);
+        const urls = await fetchMealImages(dinners, fetchImages, apiKey, cx);
         setImageUrls(urls);
 
         // Fetch shopping list

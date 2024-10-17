@@ -21,7 +21,7 @@ export function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function fetchMealImages(mealNames, fetchImages) {
+export async function fetchMealImages(mealNames, fetchImages, apiKey, cx) {
     if (!fetchImages) return new Array(mealNames.length).fill(placeholderImage);
     try {
         const urls = await Promise.all(mealNames.map(async mealName => {
