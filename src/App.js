@@ -15,7 +15,7 @@ import MealImageRow from './components/MealImageRow';
 import ShoppingList from './components/ShoppingList';
 import MacrosDisplay from './components/MacrosDisplay';
 import Settings from './components/Settings';
-import { Box } from '@mui/material';
+import { useSelector } from 'react-redux';
 const App = () => {
   const [numMeals, setNumMeals] = useState('');
   const [mealNames, setMealNames] = useState([]);
@@ -25,7 +25,7 @@ const App = () => {
   const [imageUrls, setImageUrls] = useState([]);
   const [result1, setResult1] = useState('');
   const [result2, setResult2] = useState('');
-  const [fetchImages, setFetchImages] = useState(false);
+  const fetchImages = useSelector((state) => state.settings.fetchImages);
   const [macros, setMacros] = useState('');
 
   const prompt2 = useCallback(() => {
@@ -117,11 +117,9 @@ const App = () => {
   return (
     <>
       <Header />
-      <Settings fetchImages={fetchImages} setFetchImages={setFetchImages} />
+      <Settings/>
       <MealGenerator numMeals={numMeals} setNumMeals={setNumMeals} handleSearch={handleSearch} />
       <ImageToggle
-        fetchImages={fetchImages}
-        setFetchImages={setFetchImages}
         updateMeals={updateMeals}
         fetchMacros={fetchMacros}
       />

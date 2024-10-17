@@ -3,16 +3,20 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ThemeProvider as CustomThemeProvider } from './themes/themeContext.js';
-import CssBaseline from '@mui/material/CssBaseline';  // Import CssBaseline
+import CssBaseline from '@mui/material/CssBaseline';
+import { Provider } from 'react-redux';
+import store from './store';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <CustomThemeProvider>
-    <React.StrictMode>
-      <CssBaseline />
-      <App />
-    </React.StrictMode>
-  </CustomThemeProvider>
+  <Provider store={store}>
+    <CustomThemeProvider>
+      <React.StrictMode>
+        <CssBaseline />
+        <App />
+      </React.StrictMode>
+    </CustomThemeProvider>
+  </Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function
