@@ -1,10 +1,12 @@
 // store.js
-import { createStore } from 'redux';
-import rootReducer from './reducers';
+import { configureStore } from '@reduxjs/toolkit';
+import settingsSlice from './reducers/settingsSlice';
 
-const store = createStore(
-  rootReducer,
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__() // Optional, for debugging with Redux DevTools
-);
+const store = configureStore({
+  reducer: {
+    settings: settingsSlice,
+    // Add other reducers here as needed
+  },
+});
 
 export default store;

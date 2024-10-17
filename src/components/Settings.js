@@ -5,6 +5,7 @@ import { IconButton, FormControlLabel, Switch } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ThemeToggle from './ThemeToggle';
 import { useSelector, useDispatch } from 'react-redux';
+import { toggleFetchImages } from '../reducers/settingsSlice';
 
 const Settings = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -13,10 +14,6 @@ const Settings = () => {
 
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
-  };
-
-  const handleToggleFetchImages = () => {
-    dispatch({ type: 'TOGGLE_FETCH_IMAGES' });
   };
 
   return (
@@ -32,7 +29,12 @@ const Settings = () => {
           <h2>Settings</h2>
             <ThemeToggle />
             <FormControlLabel
-                control={<Switch checked={fetchImages} onChange={handleToggleFetchImages} />}
+                control={
+                    <Switch 
+                        checked={fetchImages} 
+                        onChange={() => dispatch(toggleFetchImages())}
+                    />
+                }
                 label="Enable Images"
             />
           {/* Add more settings here as needed */}

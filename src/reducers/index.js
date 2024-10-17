@@ -1,9 +1,9 @@
 // reducers/index.js
 import { combineReducers } from 'redux';
-import settingsReducer from './settingsReducer';
+import settingsSlice from './settingsSlice';
 
 const rootReducer = combineReducers({
-  settings: settingsReducer,
+  settings: settingsSlice,
   // Add more reducers here if needed
 });
 
