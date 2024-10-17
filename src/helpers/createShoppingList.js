@@ -1,5 +1,6 @@
 const DEBUG = true;
 const LLM_API_URL = process.env.REACT_APP_LLM_API_URL;
+const LLM_API_KEY = process.env.REACT_APP_LLM_API_KEY;
 let modelType = "zephyr";  // or "CodeLlama"
 
 const wrapPrompt = (basePrompt) => {
@@ -29,6 +30,9 @@ const createInputJson = (input) => {
                 role: "user"
             }
         ],
+        temperature : 0.2,
+        max_tokens : 2048,
+        top_p : 0.8,
         stream: true
     };
 };
@@ -42,8 +46,9 @@ const llamaStreamRequest = async function* (payload) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${LLM_API_KEY}`,
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
         });
 
         // Ensure the response is ok

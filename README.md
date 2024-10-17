@@ -46,11 +46,14 @@ Create a .env file in the root of your project and add your environment variable
 REACT_APP_GOOGLE_CLOUD_API_KEY=your_google_cloud_api_key
 REACT_APP_CUSTOM_SEARCH_ENGINE_ID=your_custom_search_engine_id
 REACT_APP_LLM_API_URL=your_llm_api_url
+REACT_APP_LLM_API_KEY=your_llm_api_key
 ```
 - **REACT_APP_GOOGLE_CLOUD_API_KEY**: Your Google Cloud API key.
 - **REACT_APP_CUSTOM_SEARCH_ENGINE_ID**: Your Custom Search Engine ID.
+(both Google Cloud API key and Custom Search Engine ID can be left empty if you do not want to enable image fetching)
 - **REACT_APP_LLM_API_URL**: The URL of your Language Model API endpoint (e.g., https://api.openai.com/v1/chat/completions or your locally hosted endpoint).
 Note: If your LLM API requires authentication (e.g., API key or token), you may need to include additional environment variables or configure headers in your API calls accordingly.
+- **REACT_APP_LLM_API_KEY**: Your Language Model API key. e.g. openai_api_key or huggingface_api_token (this can be left empty if your LLM API does not require authentication).
 
 ### Starting the App
 Start the app by running:
