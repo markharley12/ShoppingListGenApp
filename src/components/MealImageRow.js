@@ -5,11 +5,11 @@ import { Box, TextField } from '@mui/material';
  * MealImageRow component that displays the meal images and allows editing of meal names.
  *
  * Props:
- *   tempMealNames: an array of strings representing the meal names
+ *   mealNames: an array of strings representing the meal names
  *   imageUrls: an array of strings representing the URLs of the meal images
- *   handleMealNameChange: a function that takes an event and an index, and updates the state of tempMealNames
+ *   handleMealNameChange: a function that takes an event and an index, and updates the state of mealNames
  */
-const MealImageRow = ({ tempMealNames, imageUrls, handleMealNameChange }) => {
+const MealImageRow = ({ mealNames, imageUrls, handleMealNameChange }) => {
   return (
     <Box
       sx={{
@@ -27,11 +27,11 @@ const MealImageRow = ({ tempMealNames, imageUrls, handleMealNameChange }) => {
           justifyContent: 'center',
         }}
       >
-        {tempMealNames.map((tempMealName, index) => (
+        {mealNames.map((mealName, index) => (
           <Box key={index} sx={{ display: 'flex', flexDirection: 'column', margin: 1 }}>
             <TextField
               type="text"
-              value={tempMealName}
+              value={mealName}
               onChange={(e) => handleMealNameChange(e, index)}
               sx={{ marginBottom: 1 }}
               variant="outlined"
@@ -40,7 +40,7 @@ const MealImageRow = ({ tempMealNames, imageUrls, handleMealNameChange }) => {
             />
             <img
               src={imageUrls[index]}
-              alt={tempMealName}
+              alt={mealName}
               style={{ width: '100px', height: '100px', objectFit: 'cover' }}
               className="meal-image"
               // This class name is used in the CSS to style the image

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { fetchBotMessages, sleep, fetchMealImages } from './helpers/helperFunctions';
+import React, { useState, useCallback } from 'react';
+import { fetchBotMessages, fetchMealImages } from './helpers/helperFunctions';
 import {
   selectNDinners,
   formatListAsSentence,
@@ -10,7 +10,7 @@ import {
 
 import Header from './components/Header';
 import MealGenerator from './components/MealGenerator';
-import ImageToggle from './components/ImageToggle';
+import MealUpdateButtons from './components/MealUpdateButtons';
 import MealImageRow from './components/MealImageRow';
 import ShoppingList from './components/ShoppingList';
 import MacrosDisplay from './components/MacrosDisplay';
@@ -19,7 +19,6 @@ import { useSelector } from 'react-redux';
 const App = () => {
   const [numMeals, setNumMeals] = useState('');
   const [mealNames, setMealNames] = useState([]);
-  const [tempMealNames, setTempMealNames] = useState([]);
   const [shoppingListPrompt, setShoppingListPrompt] = useState('');
   const [shoppingListPrompt2, setShoppingListPrompt2] = useState('');
   const [imageUrls, setImageUrls] = useState([]);
@@ -33,45 +32,47 @@ const App = () => {
   const apiKey = useSelector((state) => state.settings.apiKey);
   const cx = useSelector((state) => state.settings.cx);
 
-  const prompt2 = useCallback(() => {
-    return `My shopping list is: ${result1}\n\n Task:\n${shoppingListPrompt2}`;
-  }, [result1, shoppingListPrompt2]);
+  const handlePrompts = async (shoppingListPrompt, result1) => {
+    const prompt2 = gptShoppingListPrompt2()
+    setShoppingListPrompt2(prompt2);
 
-  const handlePrompts = useCallback(async () => {
-    if (result1 && result1 !== 'slot unavailable' && shoppingListPrompt2) {
-      console.log('Ready to process with updated prompts');
-      console.log('Waiting 5 secs for LLM API to refresh');
-      await sleep(5000);
+    const messages = [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: shoppingListPrompt },
+      { role: 'assistant', content: result1 },
+      { role: 'user', content: prompt2 }
+    ];
 
-      await fetchBotMessages(prompt2(), setResult2, llmApiUrl, llmApiKey);
-    }
-  }, [result1, shoppingListPrompt2, prompt2]);
+    await fetchBotMessages(messages, setResult2, llmApiUrl, llmApiKey);
+  };
 
-  useEffect(() => {
-    handlePrompts();
-  }, [handlePrompts]);
-
-  const updateMeals = async () => {
+  const updateMealsLogic = async (meals) => {
     try {
-      setMealNames(tempMealNames);
-      const mealNamesSentence = formatListAsSentence(tempMealNames);
+      const mealNamesSentence = formatListAsSentence(meals);
       const shoppingPrompt = gptShoppingListPrompt(mealNamesSentence);
       setShoppingListPrompt(shoppingPrompt);
 
-      const urls = await fetchMealImages(tempMealNames, fetchImages, apiKey, cx);
+      const urls = await fetchMealImages(mealNames, fetchImages, apiKey, cx);
       setImageUrls(urls);
 
+      const messages = [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: shoppingPrompt },
+      ];
+
       // Fetch shopping list
-      await fetchBotMessages(shoppingPrompt, setResult1, llmApiUrl, llmApiKey);
+      await fetchBotMessages(messages, setResult1, llmApiUrl, llmApiKey);
 
-      setShoppingListPrompt2(gptShoppingListPrompt2());
+      await handlePrompts(shoppingPrompt, result1);
 
-      // Fetch macros
-      const macroPrompt = gptMacroPrompt(mealNamesSentence);
-      await fetchBotMessages(macroPrompt, setMacros, llmApiUrl, llmApiKey);
+      await fetchMacros(shoppingPrompt, result1, shoppingListPrompt2, result2);
     } catch (error) {
       console.error('Error:', error);
     }
+  }
+
+  const updateMeals = async () => {
+    updateMealsLogic(mealNames);
   };
 
   const handleSearch = async () => {
@@ -81,42 +82,42 @@ const App = () => {
       try {
         const dinners = await selectNDinners(numDinners, './lists/Dinners.md');
         setMealNames(dinners);
-        setTempMealNames(dinners);
-        const mealNamesSentence = formatListAsSentence(dinners);
-        const shoppingPrompt = gptShoppingListPrompt(mealNamesSentence);
-        setShoppingListPrompt(shoppingPrompt);
-
-        const urls = await fetchMealImages(dinners, fetchImages, apiKey, cx);
-        setImageUrls(urls);
-
-        // Fetch shopping list
-        await fetchBotMessages(shoppingPrompt, setResult1, llmApiUrl, llmApiKey);
-
-        setShoppingListPrompt2(gptShoppingListPrompt2());
-
-        // Fetch macros
-        const macroPrompt = gptMacroPrompt(mealNamesSentence);
-        await fetchBotMessages(macroPrompt, setMacros, llmApiUrl, llmApiKey);
+        updateMealsLogic(dinners);
       } catch (error) {
         console.error('Error:', error);
       }
     }
   };
 
-  const fetchMacros = async () => {
+  const fetchMacrosButton = useCallback(async () => {
+    fetchMacros(shoppingListPrompt, result1, shoppingListPrompt2, result2)
+  }, [shoppingListPrompt, result1, shoppingListPrompt2, result2, mealNames, llmApiUrl, llmApiKey, setMacros]);
+
+  const fetchMacros = async (shoppingListPrompt, result1, shoppingListPrompt2, result2) => {
     try {
-      const mealNamesSentence = formatListAsSentence(tempMealNames);
+      const mealNamesSentence = formatListAsSentence(mealNames);
       const macroPrompt = gptMacroPrompt(mealNamesSentence);
-      await fetchBotMessages(macroPrompt, setMacros, llmApiUrl, llmApiKey);
+
+      const messages = [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: shoppingListPrompt },
+        { role: 'assistant', content: result1 },
+        { role: 'user', content: shoppingListPrompt2 },
+        { role: 'assistant', content: result2 },
+        { role: 'user', content: macroPrompt }
+      ];
+
+      await fetchBotMessages(messages, setMacros, llmApiUrl, llmApiKey);
     } catch (error) {
       console.error('Error fetching macros:', error);
     }
   };
 
+
   const handleMealNameChange = (event, index) => {
-    const updatedTempMealNames = [...tempMealNames];
-    updatedTempMealNames[index] = event.target.value;
-    setTempMealNames(updatedTempMealNames);
+    const updatedmealNames = [...mealNames];
+    updatedmealNames[index] = event.target.value;
+    setMealNames(updatedmealNames);
   };
 
   return (
@@ -124,12 +125,12 @@ const App = () => {
       <Header />
       <Settings/>
       <MealGenerator numMeals={numMeals} setNumMeals={setNumMeals} handleSearch={handleSearch} />
-      <ImageToggle
+      <MealUpdateButtons
         updateMeals={updateMeals}
-        fetchMacros={fetchMacros}
+        fetchMacros={fetchMacrosButton}
       />
       <MealImageRow
-        tempMealNames={tempMealNames}
+        mealNames={mealNames}
         imageUrls={imageUrls}
         handleMealNameChange={handleMealNameChange}
       />

@@ -1,39 +1,14 @@
 const DEBUG = true;
-let modelType = "zephyr";  // or "CodeLlama"
 
-const wrapPrompt = (basePrompt) => {
-    switch(modelType) {
-        case "zephyr":
-            return `<|system|> You are a helpful assistant. </s> <|user|> ${basePrompt} </s> <|assistant|>\n`;
-        case "CodeLlama":
-            return `
-[INST] Write code to solve the following coding problem that obeys the constraints and passes the example test cases. Please wrap your code answer using \`\`\`:
-${basePrompt}
-[/INST]
-`;
-        default:
-            return basePrompt;
-    }
-};
-
-const createInputJson = (input) => {
+const createInputJson = (messages) => {
     return {
-        messages: [
-            {
-                content: "You are a helpful assistant.",
-                role: "system"
-            },
-            {
-                content: input,
-                role: "user"
-            }
-        ],
-        temperature : 0.2,
-        max_tokens : 2048,
-        top_p : 0.8,
-        stream: true
+      messages: messages,
+      temperature: 0.2,
+      max_tokens: 2048,
+      top_p: 0.8,
+      stream: true
     };
-};
+  };
 
 const llamaStreamRequest = async function* (payload, llmApiUrl, llmApiKey) {
     if (DEBUG) {
@@ -91,14 +66,13 @@ const llamaStreamRequest = async function* (payload, llmApiUrl, llmApiKey) {
         console.error(`An error occurred in llamaStreamRequest: ${e}`);
     }
 };
-export default async function* llamaStreamQnA(input, llmApiUrl, llmApiKey) {
-    const prompt = wrapPrompt(input);
-    const request = createInputJson(prompt);
-
+export default async function* llamaStreamQnA(messages, llmApiUrl, llmApiKey) {
+    const request = createInputJson(messages);
+  
     for await (const message of llamaStreamRequest(request, llmApiUrl, llmApiKey)) {
-        yield message;
+      yield message;
     }
-}
+  }
 
 // Main function to demonstrate usage
 const main = async () => {

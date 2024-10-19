@@ -4,7 +4,7 @@ import { Box, Button } from '@mui/material';
 /**
  * ImageToggle component that allows the user to enable or disable image fetching.
  */
-const ImageToggle = ({ updateMeals, fetchMacros }) => {
+const MealUpdateButtons = ({ updateMeals, fetchMacros }) => {
   return (
     <Box sx={{ padding: 2, textAlign: 'center' }}>
       <Button variant="outlined" onClick={updateMeals} sx={{ marginRight: 1 }}>
@@ -17,4 +17,5 @@ const ImageToggle = ({ updateMeals, fetchMacros }) => {
   );
 };
 
-export default ImageToggle;
+export default MealUpdateButtons;
+

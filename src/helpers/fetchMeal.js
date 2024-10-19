@@ -51,7 +51,7 @@ export function gptShoppingListPrompt2() {
 }
 
 export const gptMacroPrompt = (mealNamesSentence) => {
-    return `For each of the following meals, please provide a brief description and their macronutrient breakdown (proteins, carbohydrates, fats) per serving. Meals: ${mealNamesSentence}`;
+    return `For each of the given meals, please provide a brief description and their macronutrient breakdown (proteins, carbohydrates, fats) per serving. ${mealNamesSentence}.`;
   };
 
 // Test the function - useful for debugging
